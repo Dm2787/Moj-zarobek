@@ -59,6 +59,10 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
         <div id="dayLabel">--</div>
         <div class="clock" id="clock">00:00:00</div>
         <div id="monthTitle">---</div>
+        <div id="weather-info" style="text-align: center; font-size: 13px; color: var(--blue); margin-bottom: 10px; min-height: 18px;">
+    Pobieram dane pogodowe...
+        </div>
+        
         <div class="progress-container"><div id="progress-bar"></div></div>
         <div class="todayWork" id="todayWork">--</div>
         <div class="break-timer" id="breakTimer"></div>
@@ -104,13 +108,12 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
         <button onclick="applyToBulk('month')" style="background:#222; color:var(--green); border:1px solid var(--green); padding:10px; border-radius:6px; width:48%; font-size:11px;">KOPIUJ MIESIĄC</button>
     </div>
     <div style="display:flex; gap:10px;">
-        <button style="flex:1; padding:12px; background:none; color:white; border:1px solid #666; border-radius:8px;" onclick="closeModal()">Anuluj</button>
-        <button style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
+        <button style="flex:%on style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
     </div>
 </div>
 
 <script>
-const monthNames = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
+const monthNames = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień"⁷,"Październik","Listopad","Grudzień"];
 const dayNamesLong = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
 
 let viewDate = new Date();
@@ -291,6 +294,29 @@ setInterval(() => {
     document.getElementById("breakTimer").innerHTML = breakInfo;
 }, 1000);
 
+function updateWeather() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&relative_humidity_2m=true`)
+            .then(res => res.json())
+            .then(data => {
+                const temp = Math.round(data.current_weather.temperature);
+                const hum = data.current_weather.relative_humidity_2m;
+                document.getElementById('weather-info').innerHTML = 
+                    `🌡️ ${temp}°C | 💧 ${hum}% wilgotności`;
+            })
+            .catch(() => {
+                document.getElementById('weather-info').innerText = "Pogoda: błąd połączenia";
+            });
+    }, () => {
+        document.getElementById('weather-info').innerText = "Włącz lokalizację w tel.";
+    });
+}
+updateWeather();
+setInterval(updateWeather, 900000);
+    
 render();
 </script>
 </body>
