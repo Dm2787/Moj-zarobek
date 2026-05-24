@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Czas pracy</title>
-    <link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -51,8 +51,10 @@ table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th { position: sticky; top: 0; background: var(--panel); color: var(--blue); padding: 12px 5px; z-index: 2; border-bottom: 2px solid #333; text-transform: uppercase; font-size: 11px; }
 td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; vertical-align: middle; }
 
-/* Komórka relatywna */
-.date-cell { font-weight: bold; position: relative; min-height: 22px; }
+/* KONTENER DNIA POŁĄCZONY W JEDNĄ STRUKTURĘ DLA IDEALNEGO WYŚRODKOWANIA DYMKA */
+.date-row-container { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 22px; }
+.date-num { font-weight: bold; width: 22px; text-align: right; }
+.date-day-name { width: 32px; text-align: left; }
 
 .saturday { color: var(--blue); }
 .saturday .edit-btn { fill: var(--blue); }
@@ -67,19 +69,23 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .edit-btn { width: 22px; height: 22px; fill: #ffffff; cursor: pointer; transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), fill 0.1s ease; display: block; margin: 0 auto; }
 .edit-btn:active { fill: var(--blue) !important; transform: scale(1.25); filter: drop-shadow(0 0 8px var(--blue)); }
 
-/* NEONOWY DYMEK Z KRESKAMI (W TABELI) */
+/* NOWY, POWIĘKSZONY NEONOWY DYMEK UMIESZCZONY CENTRALNIE */
 .neon-bubble-svg { 
-    position: absolute; 
-    top: 50%; 
-    right: 6px; 
-    transform: translateY(-50%); 
-    width: 16px; 
-    height: 14px; 
-    filter: drop-shadow(0 0 3px var(--orange)); 
+    width: 20px; 
+    height: 17px; 
+    filter: drop-shadow(0 0 4px var(--orange)); 
     cursor: help; 
+    flex-shrink: 0;
+    transition: transform 0.1s ease, filter 0.1s ease;
 }
 
-/* GLOBALNY KONTENER NA IKONĘ OBOK TEKSTU */
+/* ROZBUDOWANY EFEKT PULSOWANIA I NEONU PRZY KLIKNIĘCIU W DYMEK */
+.neon-bubble-svg:active {
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 10px var(--orange)) brightness(1.3);
+}
+
+/* GLOBALNY KONTENER NA IKONĘ OBOK TEKSTU W NAGŁÓWKU */
 .global-bubble-wrapper {
     display: none;
     align-items: center;
@@ -129,16 +135,20 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .total-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; }
 .btn-nav { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--blue); background: rgba(0,234,255,0.05); color: var(--blue); font-weight: bold; cursor: pointer; }
 
-/* MODAL */
-#editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel); padding: 20px; border: 2px solid var(--blue); z-index: 200; border-radius: 15px; width: 90%; max-width: 340px; box-shadow: 0 0 50px #000; max-height: 85vh; overflow-y: auto; }
+/* MODALE (ZJEDNOLICONA LOGIKA OVERLAY) */
 .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:150; }
+
+#editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel); padding: 20px; border: 2px solid var(--blue); z-index: 200; border-radius: 15px; width: 90%; max-width: 340px; box-shadow: 0 0 50px #000; max-height: 85vh; overflow-y: auto; }
 .time-row { display: flex; gap: 10px; margin-bottom: 5px; }
 .time-row input { background: #000; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; width: 100%; text-align: center; font-size: 15px; }
 .modal-label { display: block; font-size: 11px; color: var(--blue); margin-bottom: 3px; text-transform: uppercase; }
 .break-label { display: block; font-size: 10px; color: var(--green); margin: 8px 0 2px 0; font-weight: bold; }
-
-/* Styl dla pola uwag w modalu */
 .note-textarea { width: 100%; background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; box-sizing: border-box; font-family: Arial; font-size: 13px; resize: none; height: 50px; margin-bottom: 10px; }
+
+/* MODAL DLA PODGLĄDU NOTATKI */
+#noteModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel); padding: 22px; border: 2px solid var(--orange); z-index: 201; border-radius: 15px; width: 85%; max-width: 320px; box-shadow: 0 0 40px rgba(255, 153, 0, 0.25); }
+.note-modal-title { margin: 0 0 14px 0; color: var(--orange); text-shadow: 0 0 8px rgba(255,153,0,0.4); text-align: center; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+.note-modal-content { background: #000; border: 1px solid #333; color: #fff; padding: 14px; border-radius: 8px; font-size: 14px; line-height: 1.5; max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; margin-bottom: 15px; text-align: center; }
 </style>
 </head>
 <body>
@@ -171,7 +181,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 
     <div class="table-wrapper" id="tableWrapper">
         <table>
-            <thead><tr><th>Data</th><th>Dzień</th><th>H</th><th>PLN</th><th>⚙️</th></tr></thead>
+            <thead><tr><th colspan="2" style="width: 45%;">Dzień</th><th>H</th><th>PLN</th><th>⚙️</th></tr></thead>
             <tbody id="calendarBody"></tbody>
         </table>
     </div>
@@ -194,7 +204,8 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 
 <div id="toast" class="toast-container"></div>
 
-<div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
+<div class="modal-overlay" id="overlay" onclick="closeAllModals()"></div>
+
 <div id="editModal">
     <h3 id="modalTitle" style="margin:0 0 15px 0; color:var(--blue); text-align:center;">Ustawienia</h3>
     <span class="modal-label">Stawka PLN/h:</span>
@@ -223,9 +234,15 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
     </div>
     
     <div style="display:flex; gap:10px;">
-        <button style="flex:1; padding:12px; background:none; color:white; border:1px solid #666; border-radius:8px;" onclick="closeModal()">Anuluj</button>
+        <button style="flex:1; padding:12px; background:none; color:white; border:1px solid #666; border-radius:8px;" onclick="closeAllModals()">Anuluj</button>
         <button style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
     </div>
+</div>
+
+<div id="noteModal">
+    <h3 class="note-modal-title" id="noteModalTitle">Notatka</h3>
+    <div class="note-modal-content" id="noteModalContent"></div>
+    <button style="width:100%; padding:12px; background:var(--orange); color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="closeAllModals()">ZAMKNIJ</button>
 </div>
 
 <script>
@@ -424,7 +441,19 @@ function openEdit(key) {
     document.getElementById("overlay").style.display = "block";
 }
 
-function closeModal() { document.getElementById("editModal").style.display = "none"; document.getElementById("overlay").style.display = "none"; }
+function openNoteModal(key) {
+    if (!daysData[key] || !daysData[key].note) return;
+    document.getElementById("noteModalTitle").textContent = "Notatka z dnia " + key;
+    document.getElementById("noteModalContent").textContent = daysData[key].note;
+    document.getElementById("noteModal").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+}
+
+function closeAllModals() { 
+    document.getElementById("editModal").style.display = "none"; 
+    document.getElementById("noteModal").style.display = "none"; 
+    document.getElementById("overlay").style.display = "none"; 
+}
 
 function saveDay() {
     const key = currentEditingKey;
@@ -439,7 +468,7 @@ function saveDay() {
         if(s && e) daysData[key].customBreaks.push([s, e]);
     }
     saveToDB(key, daysData[key]);
-    closeModal(); render();
+    closeAllModals(); render();
     checkBackupStatus();
     showToast("Zapisano ustawienia dnia.");
 }
@@ -489,7 +518,7 @@ function applyToBulk(mode) {
         daysData[k].rate = rate; daysData[k].start = start; daysData[k].end = end; daysData[k].customBreaks = breaks;
         saveToDB(k, daysData[k]);
     });
-    closeModal(); render();
+    closeAllModals(); render();
     checkBackupStatus();
     showToast("Zastosowano zmiany masowe.");
 }
@@ -543,7 +572,8 @@ function render() {
         }
         if(daysData[key].work === 0) tr.className += " dayOff";
         
-        let neonBubbleElement = "";
+        /* NOWA STRUKTURA: NUMER - DYMEK (LUB ODSTĘP) - NAZWA DNIA */
+        let neonBubbleElement = `<div style="width:20px; height:17px; flex-shrink:0;"></div>`; // puste wolne miejsce gdy brak notatki
         if (daysData[key].note && daysData[key].note.trim() !== "") {
             notesCount++;
             neonBubbleElement = `
@@ -556,13 +586,26 @@ function render() {
             `;
         }
 
-        tr.innerHTML = `<td class="date-cell">${d}${neonBubbleElement}</td><td>${date.toLocaleDateString('pl-PL',{weekday:'short'})}</td><td>${h.toFixed(2)}</td><td>${mv.toFixed(0)}</td><td onclick="openEdit('${key}')">${settingsIcon}</td>`;
+        const dayNameStr = date.toLocaleDateString('pl-PL',{weekday:'short'});
+        
+        tr.innerHTML = `
+            <td colspan="2">
+                <div class="date-row-container">
+                    <span class="date-num">${d}</span>
+                    ${neonBubbleElement}
+                    <span class="date-day-name">${dayNameStr}</span>
+                </div>
+            </td>
+            <td>${h.toFixed(2)}</td>
+            <td>${mv.toFixed(0)}</td>
+            <td onclick="openEdit('${key}')">${settingsIcon}</td>
+        `;
         
         tr.onclick = (e) => { 
-            if(e.target.closest('.edit-btn') || e.target.cellIndex === 4) return; 
+            if(e.target.closest('.edit-btn') || e.target.cellIndex === 2) return; 
             
             if(e.target.classList.contains('neon-bubble-svg') || e.target.closest('.neon-bubble-svg')) {
-                alert(`Notatka z dnia ${key}:\n\n${daysData[key].note}`);
+                openNoteModal(key);
                 return;
             }
 
