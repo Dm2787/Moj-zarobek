@@ -1,9 +1,9 @@
-const CACHE_NAME = 'czas-pracy-v2';
+const CACHE_NAME = 'czas-pracy-v3'; // Zmieniłem wersję na v3, żeby zmusić przeglądarkę do odświeżenia cache
 const FILES_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  // Tu możesz dopisać swoją ikonę, jeśli masz plik na serwerze, np: './ikona.png'
+  './icon.png' // Dopasuj nazwę pliku, jeśli na serwerze nazywa się inaczej
 ];
 
 self.addEventListener('install', (evt) => {
