@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Czas pracy</title>
-    <link rel="manifest" href="manifest.json">
+    <link class="manifest" href="manifest.json">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,6 +19,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); overflo
 body { color: white; font-family: Arial; display: flex; flex-direction: column; padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) 10px; box-sizing: border-box; }
 .container { max-width: 480px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; height: 100%; position: relative; }
 
+/* USUNIĘCIE STRZĘPKÓW SYSTEMOWEGO PODŚWIETLENIA I BLOKADA ZAZNACZANIA */
+* { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+input, textarea { -webkit-user-select: text; user-select: text; }
+
 /* NOWOCZESNE POWIADOMIENIA TOAST */
 .toast-container { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: #111a22; border: 1px solid var(--blue); color: white; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none; opacity: 0; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; display: flex; align-items: center; gap: 8px; }
 .toast-container.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -29,7 +33,10 @@ body { color: white; font-family: Arial; display: flex; flex-direction: column; 
 .header { margin-bottom: 10px; flex-shrink: 0; text-align: center; padding-top: 5px; }
 #dayLabel { font-size: 15px; color: var(--blue); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 2px; font-weight: bold; }
 .clock { font-size: 42px; color: var(--blue); text-shadow: 0 0 15px var(--blue); line-height: 1; margin: 5px 0; }
-#monthTitle { font-size: 20px; color: var(--blue); font-weight: bold; margin: 8px 0 5px 0; text-transform: uppercase; }
+
+/* KONTENER TYTUŁU MIESIĄCA Z BLOKADĄ ROZJEŻDŻANIA */
+.month-title-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 8px 0 5px 0; height: 30px; }
+#monthTitle { font-size: 20px; color: var(--blue); font-weight: bold; text-transform: uppercase; margin: 0; }
 
 #weather-info { text-align: center; font-size: 12px; color: var(--blue); margin-bottom: 8px; min-height: 18px; letter-spacing: 0.5px; }
 
@@ -39,10 +46,13 @@ body { color: white; font-family: Arial; display: flex; flex-direction: column; 
 .break-timer { font-size: 14px; margin-top: 4px; color: var(--orange); font-weight: bold; min-height: 18px; height: 18px; }
 
 /* TABELA */
-.table-wrapper { flex: 1 1 auto; overflow-y: auto; border: 1px solid #333; border-radius: 8px; background: #111a22; margin-bottom: 10px; }
+.table-wrapper { flex: 1 1 auto; overflow-y: auto; border: 1px solid #333; border-radius: 8px; background: #111a22; margin-bottom: 10px; scroll-behavior: smooth; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th { position: sticky; top: 0; background: var(--panel); color: var(--blue); padding: 12px 5px; z-index: 2; border-bottom: 2px solid #333; text-transform: uppercase; font-size: 11px; }
-td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
+td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; vertical-align: middle; }
+
+/* Komórka relatywna */
+.date-cell { font-weight: bold; position: relative; min-height: 22px; }
 
 .saturday { color: var(--blue); }
 .saturday .edit-btn { fill: var(--blue); }
@@ -52,7 +62,44 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
 .today { background: rgba(255, 153, 0, 0.15) !important; color: var(--orange) !important; font-weight: bold; }
 .dayOff { opacity: 0.3; text-decoration: line-through; }
 .weekSummary { background: rgba(0,0,0,0.4); color: var(--green); font-weight: bold; font-size: 12px; }
-.edit-btn { width: 22px; height: 22px; fill: #666; cursor: pointer; }
+
+/* BIAŁE IKONKI Z EFEKTEM NEONOWEGO KLIKNIĘCIA */
+.edit-btn { width: 22px; height: 22px; fill: #ffffff; cursor: pointer; transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), fill 0.1s ease; display: block; margin: 0 auto; }
+.edit-btn:active { fill: var(--blue) !important; transform: scale(1.25); filter: drop-shadow(0 0 8px var(--blue)); }
+
+/* NEONOWY DYMEK Z KRESKAMI (W TABELI) */
+.neon-bubble-svg { 
+    position: absolute; 
+    top: 50%; 
+    right: 6px; 
+    transform: translateY(-50%); 
+    width: 16px; 
+    height: 14px; 
+    filter: drop-shadow(0 0 3px var(--orange)); 
+    cursor: help; 
+}
+
+/* GLOBALNY KONTENER NA IKONĘ OBOK TEKSTU */
+.global-bubble-wrapper {
+    display: none;
+    align-items: center;
+    gap: 6px;
+}
+
+/* GLOBALNA IKONA IDENTYCZNA Z TĄ Z TABELI */
+.global-bubble-svg {
+    width: 16px;
+    height: 14px;
+    filter: drop-shadow(0 0 3px var(--orange));
+}
+
+/* CYFRA WYŚWIETLANA OBOK IKONY */
+.global-bubble-text {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--orange);
+    text-shadow: 0 0 5px var(--orange);
+}
 
 /* DOLNY PANEL BACKUPU */
 .backup-footer-row { display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0; }
@@ -89,6 +136,9 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
 .time-row input { background: #000; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; width: 100%; text-align: center; font-size: 15px; }
 .modal-label { display: block; font-size: 11px; color: var(--blue); margin-bottom: 3px; text-transform: uppercase; }
 .break-label { display: block; font-size: 10px; color: var(--green); margin: 8px 0 2px 0; font-weight: bold; }
+
+/* Styl dla pola uwag w modalu */
+.note-textarea { width: 100%; background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; box-sizing: border-box; font-family: Arial; font-size: 13px; resize: none; height: 50px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -97,7 +147,21 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
     <div class="header">
         <div id="dayLabel">--</div>
         <div class="clock" id="clock">00:00:00</div>
-        <div id="monthTitle">---</div>
+        
+        <div class="month-title-container">
+            <div id="monthTitle">---</div>
+            
+            <div id="globalMonthBubbleWrapper" class="global-bubble-wrapper">
+                <svg class="global-bubble-svg" viewBox="0 0 24 20">
+                    <path d="M2 5 C2 2, 4 2, 7 2 L17 2 C20 2, 22 2, 22 5 L22 13 C22 16, 20 16, 17 16 L7 16 L3 19 L3 16 C2 16, 2 15, 2 13 Z" fill="#0b0f14" stroke="var(--orange)" stroke-width="1.8" stroke-linejoin="round"/>
+                    <line x1="6" y1="6" x2="18" y2="6" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="6" y1="9.5" x2="18" y2="9.5" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="6" y1="13" x2="14" y2="13" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span id="globalBubbleCount" class="global-bubble-text">0</span>
+            </div>
+        </div>
+        
         <div id="weather-info">Pobieram lokalizację...</div>
         
         <div class="progress-container"><div id="progress-bar"></div></div>
@@ -105,7 +169,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
         <div class="break-timer" id="breakTimer"></div>
     </div>
 
-    <div class="table-wrapper">
+    <div class="table-wrapper" id="tableWrapper">
         <table>
             <thead><tr><th>Data</th><th>Dzień</th><th>H</th><th>PLN</th><th>⚙️</th></tr></thead>
             <tbody id="calendarBody"></tbody>
@@ -139,7 +203,10 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
     <span class="modal-label" style="font-weight:bold;">Godziny Pracy:</span>
     <div class="time-row"><input type="time" id="workStart"> <input type="time" id="workEnd"></div>
     
-    <div style="margin-top:15px; padding-top:10px; border-top:1px solid #444;">
+    <span class="modal-label" style="margin-top: 10px;">📝 Uwagi / Notatki do dnia:</span>
+    <textarea id="dayNote" class="note-textarea" placeholder="Np. Czwartek wolny, obcięta godzina itp."></textarea>
+    
+    <div style="margin-top:5px; padding-top:10px; border-top:1px solid #444;">
         <span class="break-label">PRZERWA 1:</span>
         <div class="time-row"><input type="time" id="editB1S"> <input type="time" id="editB1E"></div>
         <span class="break-label">PRZERWA 2:</span>
@@ -148,7 +215,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
         <div class="time-row"><input type="time" id="editB3S"> <input type="time" id="editB3E"></div>
     </div>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:20px 0 15px 0;">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:15px 0 15px 0;">
         <button onclick="applyToBulk('week')" style="background:#222; color:var(--green); border:1px solid var(--green); padding:10px; border-radius:6px; font-size:11px;">KOPIUJ TYDZIEŃ</button>
         <button onclick="applyToBulk('month')" style="background:#222; color:var(--green); border:1px solid var(--green); padding:10px; border-radius:6px; font-size:11px;">KOPIUJ MIESIĄC</button>
         <button onclick="applyToBulk('saturday')" style="background:#222; color:var(--blue); border:1px solid var(--blue); padding:10px; border-radius:6px; font-size:11px;">KOPIUJ SOBOTY</button>
@@ -191,7 +258,6 @@ function checkBackupStatus() {
     const exportIcon = document.getElementById("exportIcon");
     const now = new Date();
     
-    // NOWOŚĆ: Sprawdzanie, czy w ostatnich 7 dniach są jakiekolwiek godziny pracy
     let totalHoursLast7Days = 0;
     for (let i = 0; i < 7; i++) {
         let checkDate = new Date();
@@ -202,7 +268,6 @@ function checkBackupStatus() {
         }
     }
 
-    // Jeśli brak przepracowanych godzin w całym tygodniu, całkowicie wyłączamy alarm
     if (totalHoursLast7Days <= 0) {
         exportBtn.classList.remove("needs-backup");
         exportIcon.innerHTML = "📤";
@@ -345,11 +410,12 @@ function importData(event) {
 
 function openEdit(key) {
     currentEditingKey = key;
-    const data = daysData[key] || {rate: 80, work: 1, start: "00:00", end: "00:00", customBreaks: []};
+    const data = daysData[key] || {rate: 80, work: 1, start: "00:00", end: "00:00", customBreaks: [], note: ""};
     document.getElementById("modalTitle").textContent = "Ustaw: " + key;
     document.getElementById("editRate").value = data.rate || 80;
     document.getElementById("workStart").value = data.start || "00:00";
     document.getElementById("workEnd").value = data.end || "00:00";
+    document.getElementById("dayNote").value = data.note || "";
     for(let i=1; i<=3; i++) {
         const b = (data.customBreaks && data.customBreaks[i-1]) ? data.customBreaks[i-1] : ["", ""];
         document.getElementById(`editB${i}S`).value = b[0]; document.getElementById(`editB${i}E`).value = b[1];
@@ -366,6 +432,7 @@ function saveDay() {
     daysData[key].rate = Number(document.getElementById("editRate").value);
     daysData[key].start = document.getElementById("workStart").value;
     daysData[key].end = document.getElementById("workEnd").value;
+    daysData[key].note = document.getElementById("dayNote").value;
     daysData[key].customBreaks = [];
     for(let i=1; i<=3; i++) {
         let s = document.getElementById(`editB${i}S`).value, e = document.getElementById(`editB${i}E`).value;
@@ -458,25 +525,51 @@ function render() {
     let lastDay = new Date(y, m+1, 0).getDate();
     let totH = 0, totM = 0, wH = 0, wM = 0;
     let todayKey = getKey(new Date());
+    
+    let notesCount = 0;
 
     for(let d=1; d<=lastDay; d++) {
         let date = new Date(y, m, d), dw = date.getDay(), key = getKey(date);
-        if(!daysData[key]) daysData[key] = {rate:80, work:1, start:"00:00", end:"00:00", customBreaks:[]};
+        if(!daysData[key]) daysData[key] = {rate:80, work:1, start:"00:00", end:"00:00", customBreaks:[], note:""};
         let h = calculateWork(date, daysData[key]), mv = h * (daysData[key].rate || 80);
         totH += h; totM += mv; wH += h; wM += mv;
         let tr = document.createElement("tr");
         if(dw === 6) tr.className = "saturday";
         if(dw === 0) tr.className = "sunday";
-        if(key === todayKey) tr.classList.add("today");
+        
+        if(key === todayKey) {
+            tr.classList.add("today");
+            tr.id = "today-row";
+        }
         if(daysData[key].work === 0) tr.className += " dayOff";
-        tr.innerHTML = `<td>${d}</td><td>${date.toLocaleDateString('pl-PL',{weekday:'short'})}</td><td>${h.toFixed(2)}</td><td>${mv.toFixed(0)}</td><td onclick="openEdit('${key}')">${settingsIcon}</td>`;
+        
+        let neonBubbleElement = "";
+        if (daysData[key].note && daysData[key].note.trim() !== "") {
+            notesCount++;
+            neonBubbleElement = `
+                <svg class="neon-bubble-svg" viewBox="0 0 24 20" title="${daysData[key].note.replace(/"/g, '&quot;')}">
+                    <path d="M2 5 C2 2, 4 2, 7 2 L17 2 C20 2, 22 2, 22 5 L22 13 C22 16, 20 16, 17 16 L7 16 L3 19 L3 16 C2 16, 2 15, 2 13 Z" fill="#000" stroke="var(--orange)" stroke-width="1.8" stroke-linejoin="round"/>
+                    <line x1="6" y1="6" x2="18" y2="6" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="6" y1="9.5" x2="18" y2="9.5" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="6" y1="13" x2="14" y2="13" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            `;
+        }
+
+        tr.innerHTML = `<td class="date-cell">${d}${neonBubbleElement}</td><td>${date.toLocaleDateString('pl-PL',{weekday:'short'})}</td><td>${h.toFixed(2)}</td><td>${mv.toFixed(0)}</td><td onclick="openEdit('${key}')">${settingsIcon}</td>`;
         
         tr.onclick = (e) => { 
             if(e.target.closest('.edit-btn') || e.target.cellIndex === 4) return; 
+            
+            if(e.target.classList.contains('neon-bubble-svg') || e.target.closest('.neon-bubble-svg')) {
+                alert(`Notatka z dnia ${key}:\n\n${daysData[key].note}`);
+                return;
+            }
+
             daysData[key].work = daysData[key].work ? 0 : 1; 
             saveToDB(key, daysData[key]); 
             render(); 
-            checkBackupStatus(); // Odśwież status backupu przy ręcznym klikaniu wolnego/pracy
+            checkBackupStatus();
         };
         tbody.appendChild(tr);
         if(dw === 0 || d === lastDay) {
@@ -484,8 +577,28 @@ function render() {
             wH = 0; wM = 0;
         }
     }
+    
+    const globalWrapper = document.getElementById("globalMonthBubbleWrapper");
+    const globalCountText = document.getElementById("globalBubbleCount");
+    
+    if (notesCount > 0) {
+        globalCountText.textContent = notesCount;
+        globalWrapper.style.display = "flex";
+    } else {
+        globalWrapper.style.display = "none";
+    }
+
     document.getElementById("totalHours").textContent = totH.toFixed(2);
     document.getElementById("totalMoney").textContent = totM.toFixed(0) + " zł";
+}
+
+function scrollToToday() {
+    setTimeout(() => {
+        const todayRow = document.getElementById("today-row");
+        if (todayRow) {
+            todayRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 300);
 }
 
 function formatTimeLeft(ms) {
@@ -593,6 +706,7 @@ initDB().then(() => {
         render();
         updateWeather();
         checkBackupStatus();
+        scrollToToday();
         setInterval(updateWeather, 900000);
     });
 });
