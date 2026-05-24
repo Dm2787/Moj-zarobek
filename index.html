@@ -14,18 +14,24 @@
 <link rel="icon" href="icon.png">
 
 <style>
-:root { --blue: #00eaff; --green: #00ffa6; --orange: #ff9900; --red: #ff4040; --bg: #0b0f14; --panel: #1a242d; }
+:root { --blue: #00eaff; --green: #00ffa6; --orange: #ff9900; --red: #ff1a1a; --bg: #0b0f14; --panel: #1a242d; }
 html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); overflow: hidden; }
 body { color: white; font-family: Arial; display: flex; flex-direction: column; padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) 10px; box-sizing: border-box; }
-.container { max-width: 480px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; height: 100%; }
+.container { max-width: 480px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; height: 100%; position: relative; }
+
+/* NOWOCZESNE POWIADOMIENIA TOAST */
+.toast-container { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: #111a22; border: 1px solid var(--blue); color: white; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: bold; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none; opacity: 0; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; display: flex; align-items: center; gap: 8px; }
+.toast-container.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast-container.toast-success { border-color: var(--green); color: var(--green); }
+.toast-container.toast-error { border-color: var(--red); color: var(--red); }
 
 /* NAGŁÓWEK */
-.header { margin-bottom: 15px; flex-shrink: 0; text-align: center; }
-#dayLabel { font-size: 14px; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+.header { margin-bottom: 10px; flex-shrink: 0; text-align: center; padding-top: 5px; }
+#dayLabel { font-size: 15px; color: var(--blue); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 2px; font-weight: bold; }
 .clock { font-size: 42px; color: var(--blue); text-shadow: 0 0 15px var(--blue); line-height: 1; margin: 5px 0; }
-#monthTitle { font-size: 20px; color: var(--blue); font-weight: bold; margin: 10px 0 5px 0; text-transform: uppercase; }
+#monthTitle { font-size: 20px; color: var(--blue); font-weight: bold; margin: 8px 0 5px 0; text-transform: uppercase; }
 
-#weather-info { text-align: center; font-size: 12px; color: var(--blue); margin-bottom: 10px; min-height: 18px; letter-spacing: 0.5px; }
+#weather-info { text-align: center; font-size: 12px; color: var(--blue); margin-bottom: 8px; min-height: 18px; letter-spacing: 0.5px; }
 
 .progress-container { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 8px 0; overflow: hidden; }
 #progress-bar { width: 0%; height: 100%; background: var(--blue); box-shadow: 0 0 10px var(--blue); transition: width 0.5s; }
@@ -47,6 +53,29 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
 .dayOff { opacity: 0.3; text-decoration: line-through; }
 .weekSummary { background: rgba(0,0,0,0.4); color: var(--green); font-weight: bold; font-size: 12px; }
 .edit-btn { width: 22px; height: 22px; fill: #666; cursor: pointer; }
+
+/* DOLNY PANEL BACKUPU */
+.backup-footer-row { display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0; }
+.btn-backup { flex: 1; background: rgba(0, 234, 255, 0.03); border: 1px solid rgba(0, 234, 255, 0.3); color: #a0e6ff; font-size: 12px; font-weight: bold; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; }
+.btn-backup:active { background: rgba(0, 234, 255, 0.15); }
+
+/* AGRESYWNY ALARM NEONOWEJ CZERWIENI */
+.btn-backup.needs-backup { background: rgba(255, 26, 26, 0.25) !important; border: 2px solid #ff1a1a !important; color: #ffffff !important; font-weight: 900; animation: pulse-emergency 1.2s infinite ease-in-out; }
+
+/* ANIMACJA DIODY ALARMOWEJ */
+@keyframes pulse-emergency {
+    0% { box-shadow: 0 0 2px rgba(255, 26, 26, 0.4); background: rgba(255, 26, 26, 0.2); }
+    50% { box-shadow: 0 0 16px rgba(255, 26, 26, 0.85); background: rgba(255, 26, 26, 0.4); border-color: #ff6666 !important; }
+    100% { box-shadow: 0 0 2px rgba(255, 26, 26, 0.4); background: rgba(255, 26, 26, 0.2); }
+}
+
+/* ANIMACJA PULSUJĄCEGO TRÓJKĄTA */
+.warning-triangle { display: inline-block; font-size: 14px; animation: breathe-triangle 1.2s infinite ease-in-out; margin-right: 2px; }
+@keyframes breathe-triangle {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); filter: drop-shadow(0 0 4px #ff1a1a); }
+    100% { transform: scale(1); }
+}
 
 /* STOPKA */
 .footer { flex-shrink: 0; background: var(--panel); padding: 15px; border-radius: 12px; border-top: 3px solid var(--green); }
@@ -83,6 +112,12 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
         </table>
     </div>
 
+    <div class="backup-footer-row">
+        <button class="btn-backup" id="exportBtn" onclick="exportData()"><span id="exportIcon" style="display:inline-block;">📤</span> <span id="exportText">EKSPORT</span></button>
+        <button class="btn-backup" onclick="document.getElementById('importFile').click()">📥 IMPORT</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+
     <div class="footer">
         <div class="total-row"><span>Suma godzin:</span><span id="totalHours" style="color:var(--green);">0.00</span></div>
         <div class="total-row"><span>Zarobek:</span><span id="totalMoney" style="color:var(--green);">0 zł</span></div>
@@ -92,6 +127,8 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
         </div>
     </div>
 </div>
+
+<div id="toast" class="toast-container"></div>
 
 <div class="modal-overlay" id="overlay" onclick="closeModal()"></div>
 <div id="editModal">
@@ -136,9 +173,68 @@ const settingsIcon = `<svg class="edit-btn" viewBox="0 0 24 24"><path d="M3 17v2
 
 function getKey(date) { return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(); }
 
-// INICJALIZACJA PANCERNEJ BAZY INDEXEDDB
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = "toast-container show";
+    if (type === "success") toast.classList.add("toast-success");
+    if (type === "error") toast.classList.add("toast-error");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
+
+function checkBackupStatus() {
+    const lastBackup = localStorage.getItem("last_backup_date");
+    const exportBtn = document.getElementById("exportBtn");
+    const exportIcon = document.getElementById("exportIcon");
+    const now = new Date();
+    
+    let triggerAlert = false;
+
+    if (!lastBackup) {
+        triggerAlert = true;
+    } else {
+        const diffDays = Math.floor((now - new Date(lastBackup)) / (1000 * 60 * 60 * 24));
+        if (diffDays >= 7) {
+            triggerAlert = true;
+        }
+    }
+
+    if (now.getDay() === 6) {
+        const todayKey = getKey(now);
+        const todayData = daysData[todayKey];
+        if (todayData && todayData.work !== 0 && todayData.end) {
+            const endParts = todayData.end.split(":").map(Number);
+            const workEndTime = new Date();
+            workEndTime.setHours(endParts[0], endParts[1], 0, 0);
+            
+            if (now >= workEndTime) {
+                if (!lastBackup || new Date(lastBackup) < workEndTime) {
+                    triggerAlert = true;
+                }
+            }
+        }
+    }
+
+    if (triggerAlert) {
+        exportBtn.classList.add("needs-backup");
+        exportIcon.innerHTML = `<span class="warning-triangle">⚠️</span>`;
+    } else {
+        exportBtn.classList.remove("needs-backup");
+        exportIcon.innerHTML = "📤";
+    }
+}
+
 function initDB() {
     return new Promise((resolve) => {
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then(persistent => {
+                if (persistent) console.log("Pamięć zabezpieczona.");
+            });
+        }
+
         const req = indexedDB.open("WORK_DATA_DB", 1);
         req.onupgradeneeded = e => {
             e.target.result.createObjectStore("days", { keyPath: "key" });
@@ -154,14 +250,12 @@ function initDB() {
     });
 }
 
-// ZAPIS JEDNEGO DNIA DO INDEXEDDB
 function saveToDB(key, data) {
     if (!db) return;
     const tx = db.transaction("days", "readwrite");
     tx.objectStore("days").put({ key: key, ...data });
 }
 
-// ŁADOWANIE WSZYSTKICH DANYCH Z INDEXEDDB
 function loadFromDB() {
     return new Promise((resolve) => {
         if (!db) return resolve();
@@ -176,6 +270,59 @@ function loadFromDB() {
         };
         req.onerror = () => resolve();
     });
+}
+
+function exportData() {
+    if (!db) return showToast("Baza danych nie jest gotowa.", "error");
+    const tx = db.transaction("days", "readonly");
+    const store = tx.objectStore("days");
+    const req = store.getAll();
+
+    req.onsuccess = () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(req.result, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `czas_pracy_kopia_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        
+        localStorage.setItem("last_backup_date", new Date().toISOString());
+        checkBackupStatus();
+        showToast("Kopia zapasowa została pobrana!");
+    };
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedItems = JSON.parse(e.target.result);
+            if (!Array.isArray(importedItems)) throw new Error("Nieprawidłowy format pliku.");
+
+            const tx = db.transaction("days", "readwrite");
+            const store = tx.objectStore("days");
+
+            importedItems.forEach(item => {
+                if (item.key) store.put(item);
+            });
+
+            tx.oncomplete = () => {
+                showToast("Dane zostały pomyślnie przywrócone!");
+                loadFromDB().then(() => {
+                    render();
+                    checkBackupStatus();
+                });
+            };
+        } catch (err) {
+            showToast("Błąd importu pliku.", "error");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
 }
 
 function openEdit(key) {
@@ -208,6 +355,8 @@ function saveDay() {
     }
     saveToDB(key, daysData[key]);
     closeModal(); render();
+    checkBackupStatus();
+    showToast("Zapisano ustawienia dnia.");
 }
 
 function applyToBulk(mode) {
@@ -229,16 +378,16 @@ function applyToBulk(mode) {
     else if(mode === 'saturday') {
         for(let d=1; d<=lastDay; d++) {
             let date = new Date(y, m, d);
-            if(date.getDay() === 6) targets.push(date); // 6 = Sobota
+            if(date.getDay() === 6) targets.push(date);
         }
     }
     else if(mode === 'sunday') {
         for(let d=1; d<=lastDay; d++) {
             let date = new Date(y, m, d);
-            if(date.getDay() === 0) targets.push(date); // 0 = Niedziela
+            if(date.getDay() === 0) targets.push(date);
         }
     }
-    else { // Opcja 'week' (tydzień)
+    else {
         const baseDate = new Date(currentEditingKey);
         let dw = baseDate.getDay();
         let diff = (dw === 0 ? -6 : 1 - dw);
@@ -256,6 +405,8 @@ function applyToBulk(mode) {
         saveToDB(k, daysData[k]);
     });
     closeModal(); render();
+    checkBackupStatus();
+    showToast("Zastosowano zmiany masowe.");
 }
 
 function calculateWork(date, dayObj) {
@@ -302,7 +453,6 @@ function render() {
         if(daysData[key].work === 0) tr.className += " dayOff";
         tr.innerHTML = `<td>${d}</td><td>${date.toLocaleDateString('pl-PL',{weekday:'short'})}</td><td>${h.toFixed(2)}</td><td>${mv.toFixed(0)}</td><td onclick="openEdit('${key}')">${settingsIcon}</td>`;
         
-        // POPRAWIONE KLIKANIE NA DZIEŃ WOLNY Z ZAPISEM DO INDEXEDDB
         tr.onclick = (e) => { 
             if(e.target.closest('.edit-btn') || e.target.cellIndex === 4) return; 
             daysData[key].work = daysData[key].work ? 0 : 1; 
@@ -327,7 +477,6 @@ function formatTimeLeft(ms) {
 
 function changeMonth(step) { viewDate.setMonth(viewDate.getMonth() + step); render(); }
 
-// SYSTEM POGODY Z NAZWĄ MIASTA (GPS -> GEOLOKALIZACJA)
 function updateWeather() {
     const weatherInfo = document.getElementById('weather-info');
 
@@ -380,20 +529,21 @@ setInterval(() => {
     let dObj = daysData[key];
     let breakInfo = "";
     
+    if(now.getSeconds() === 0) {
+        checkBackupStatus();
+    }
+
     if(dObj && dObj.work !== 0 && dObj.start !== dObj.end) {
         let s = new Date(); s.setHours(...dObj.start.split(":").map(Number),0,0);
         let e = new Date(); e.setHours(...dObj.end.split(":").map(Number),0,0);
 
         if(now >= s && now <= e) {
-            // Trwa praca
             document.getElementById("progress-bar").style.width = ((now - s) / (e - s) * 100) + "%";
             document.getElementById("todayWork").textContent = `Dziś: ${calculateWork(now, dObj).toFixed(2)}h`;
         } else if (now > e) {
-            // Po pracy (Fajrant do 23:59:59)
             document.getElementById("progress-bar").style.width = "100%";
             document.getElementById("todayWork").innerHTML = '<span style="color:#ffd700;">FAJRANT! 🍻</span>';
         } else if (now < s) {
-            // Przed pracą (od północy do startu)
             document.getElementById("progress-bar").style.width = "0%";
             document.getElementById("todayWork").innerHTML = `<span style="color:var(--blue);">Start za: ${formatTimeLeft(s - now)}</span>`;
         }
@@ -407,7 +557,6 @@ setInterval(() => {
             else if (bs > now && (!nextBreak || bs < nextBreak)) nextBreak = bs;
         });
 
-        // Informacje o przerwie pokazujemy tylko w trakcie pracy
         if(currentBreak) {
             breakInfo = `<span style="color:var(--green)">PRZERWA! (zostało: ${formatTimeLeft(currentBreak)})</span>`;
         } else if(nextBreak && now >= s && now <= e) {
@@ -420,23 +569,22 @@ setInterval(() => {
     document.getElementById("breakTimer").innerHTML = breakInfo;
 }, 1000);
 
-// INICJALIZACJA SEKENCJI INTEGRACJI BAZY DANYCH
 initDB().then(() => {
     loadFromDB().then(() => {
         render();
         updateWeather();
+        checkBackupStatus();
         setInterval(updateWeather, 900000);
     });
 });
 </script>
 
 <script>
-  // Rejestracja Service Workera
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker działa! Aplikacja gotowa na tryb offline.'))
-        .catch(err => console.log('Błąd rejestracji Service Workera:', err));
+        .then(reg => console.log('Service Worker działa!'))
+        .catch(err => console.log('Błąd SW:', err));
     });
   }
 </script>
