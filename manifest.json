@@ -1,7 +1,7 @@
 {
   "name": "Czas pracy",
   "short_name": "Czas pracy",
-  "start_url": "./index.html",
+  "start_url": "./"
   "display": "standalone",
   "background_color": "#0b0f14",
   "theme_color": "#00eaff",
