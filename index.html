@@ -191,6 +191,24 @@ function checkBackupStatus() {
     const exportIcon = document.getElementById("exportIcon");
     const now = new Date();
     
+    // NOWOŚĆ: Sprawdzanie, czy w ostatnich 7 dniach są jakiekolwiek godziny pracy
+    let totalHoursLast7Days = 0;
+    for (let i = 0; i < 7; i++) {
+        let checkDate = new Date();
+        checkDate.setDate(now.getDate() - i);
+        let k = getKey(checkDate);
+        if (daysData[k]) {
+            totalHoursLast7Days += calculateWork(checkDate, daysData[k]);
+        }
+    }
+
+    // Jeśli brak przepracowanych godzin w całym tygodniu, całkowicie wyłączamy alarm
+    if (totalHoursLast7Days <= 0) {
+        exportBtn.classList.remove("needs-backup");
+        exportIcon.innerHTML = "📤";
+        return;
+    }
+
     let triggerAlert = false;
 
     if (!lastBackup) {
@@ -458,6 +476,7 @@ function render() {
             daysData[key].work = daysData[key].work ? 0 : 1; 
             saveToDB(key, daysData[key]); 
             render(); 
+            checkBackupStatus(); // Odśwież status backupu przy ręcznym klikaniu wolnego/pracy
         };
         tbody.appendChild(tr);
         if(dw === 0 || d === lastDay) {
