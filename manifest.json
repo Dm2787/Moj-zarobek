@@ -38,21 +38,5 @@
       "form_factor": "narrow",
       "label": "Okno edycji dnia"
     }
-  ],
-  "shortcuts": [
-    {
-      "name": "Dodaj wpis",
-      "short_name": "Dodaj",
-      "description": "Szybkie dodawanie godzin pracy do tabeli",
-      "url": "./index.html?action=add",
-      "icons": [{ "src": "./icon.png", "sizes": "1024x1024" }]
-    },
-    {
-      "name": "Ustawienia aplikacji",
-      "short_name": "Ustawienia",
-      "description": "Przejdź do ustawień stawek i konfiguracji",
-      "url": "./index.html?action=settings",
-      "icons": [{ "src": "./icon.png", "sizes": "1024x1024" }]
-    }
   ]
 }
