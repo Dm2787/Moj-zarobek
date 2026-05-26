@@ -25,28 +25,28 @@
   ],
   "screenshots": [
     {
-      "src": "./1000032466.jpg",
+      "src": "https://raw.githubusercontent.com/Dm2787/Moj-zarobek/main/1000032466.jpg",
       "sizes": "1080x2400",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Główny widok tabeli godzin i zarobków"
     },
     {
-      "src": "./1000032465.jpg",
+      "src": "https://raw.githubusercontent.com/Dm2787/Moj-zarobek/main/1000032465.jpg",
       "sizes": "1080x2400",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Okno edycji dnia, przerw i notatek"
     },
     {
-      "src": "./1000032464.jpg",
+      "src": "https://raw.githubusercontent.com/Dm2787/Moj-zarobek/main/1000032464.jpg",
       "sizes": "1080x2400",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Podsumowanie miesięczne i statystyki"
     },
     {
-      "src": "./1000032469.jpg",
+      "src": "https://raw.githubusercontent.com/Dm2787/Moj-zarobek/main/1000032469.jpg",
       "sizes": "1080x2400",
       "type": "image/jpeg",
       "form_factor": "narrow",
