@@ -25,30 +25,30 @@
   ],
   "screenshots": [
     {
-      "src": "https://raw.githubusercontent.com/Dm2787/Moj-zarobek/main/1000032466.jpg",
+      "src": "001.png",
       "sizes": "1080x2400",
-      "type": "image/jpeg",
+      "type": "image/png",
       "form_factor": "narrow",
       "label": "Główny widok tabeli godzin i zarobków"
     },
     {
-      "src": "https://raw.githubusercontent.com/Dm2787/Moj-zarobek/main/1000032465.jpg",
+      "src": "002.png",
       "sizes": "1080x2400",
-      "type": "image/jpeg",
+      "type": "image/png",
       "form_factor": "narrow",
       "label": "Okno edycji dnia, przerw i notatek"
     },
     {
-      "src": "https://raw.githubusercontent.com/Dm2787/Moj-zarobek/main/1000032464.jpg",
+      "src": "003.png",
       "sizes": "1080x2400",
-      "type": "image/jpeg",
+      "type": "image/png",
       "form_factor": "narrow",
       "label": "Podsumowanie miesięczne i statystyki"
     },
     {
-      "src": "https://raw.githubusercontent.com/Dm2787/Moj-zarobek/main/1000032469.jpg",
+      "src": "004.png",
       "sizes": "1080x2400",
-      "type": "image/jpeg",
+      "type": "image/png",
       "form_factor": "narrow",
       "label": "Konfiguracja stawek i ustawienia aplikacji"
     }
