@@ -25,32 +25,18 @@
   ],
   "screenshots": [
     {
-      "src": "001.png",
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
       "sizes": "1080x2400",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Główny widok tabeli godzin i zarobków"
+      "label": "Główny widok tabeli"
     },
     {
-      "src": "002.png",
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
       "sizes": "1080x2400",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Okno edycji dnia, przerw i notatek"
-    },
-    {
-      "src": "003.png",
-      "sizes": "1080x2400",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Podsumowanie miesięczne i statystyki"
-    },
-    {
-      "src": "004.png",
-      "sizes": "1080x2400",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Konfiguracja stawek i ustawienia aplikacji"
+      "label": "Okno edycji dnia"
     }
   ]
 }
