@@ -763,6 +763,39 @@ initDB().then(() => {
         .catch(err => console.log('Błąd SW:', err));
     });
   }
+
+// Obsługa skrótów z menu ikony na pulpicie Androida
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const akcja = urlParams.get('action');
+
+    if (!akcja) return; // Jeśli aplikacja włączyła się normalnie, nic nie rób
+
+    // Czekamy ułamek sekundy, aż cała strona i formularze się załadują
+    setTimeout(() => {
+        if (akcja === 'settings') {
+            // Szukamy ikony zębatki ustawień po klasach FontAwesome lub tagu button
+            const przyciskUstawien = document.querySelector('.fa-gear') || 
+                                     document.querySelector('.fa-cog') || 
+                                     document.querySelector('button[onclick*="settings"]') ||
+                                     document.querySelector('#settings-btn');
+                                     
+            if (przyciskUstawien) {
+                przyciskUstawien.click(); // Automatycznie otwiera sekcję ustawień
+            }
+        } 
+        else if (akcja === 'add') {
+            // Szukamy przycisku dodawania nowego dnia / wpisu
+            const przyciskDodaj = document.querySelector('.add-btn') || 
+                                  document.querySelector('button[onclick*="show"]') ||
+                                  document.querySelector('#add-entry-btn');
+                                  
+            if (przyciskDodaj) {
+                przyciskDodaj.click(); // Automatycznie otwiera okienko dodawania
+            }
+        }
+    }, 400); // Małe opóźnienie, żeby interfejs zdążył się narysować
+});
 </script>
 
 </body>
