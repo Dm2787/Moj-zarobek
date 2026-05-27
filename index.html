@@ -135,6 +135,46 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .total-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; }
 .btn-nav { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--blue); background: rgba(0,234,255,0.05); color: var(--blue); font-weight: bold; cursor: pointer; position: relative; z-index: 10; -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease, background 0.1s ease; }
 .btn-nav:active { background: rgba(0, 234, 255, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
+    
+    /* PŁYNNE ZMIANY DLA PRZYCISKÓW W MODALU */
+#editModal button { transition: transform 0.1s ease, background 0.1s ease; -webkit-tap-highlight-color: transparent; }
+
+/* EFEKT KLIKNIĘCIA DLA ZIELONYCH (TYDEŃ, MIESIĄC) */
+#editModal button[onclick*="'week'"]:active, 
+#editModal button[onclick*="'month'"]:active { 
+    background: rgba(0, 255, 166, 0.25) !important; 
+    transform: scale(0.95); 
+    filter: drop-shadow(0 0 8px var(--green)); 
+}
+
+/* EFEKT KLIKNIĘCIA DLA SOBÓT (BŁĘKITNY) */
+#editModal button[onclick*="'saturday'"]:active { 
+    background: rgba(0, 234, 255, 0.25) !important; 
+    transform: scale(0.95); 
+    filter: drop-shadow(0 0 8px var(--blue)); 
+}
+
+/* EFEKT KLIKNIĘCIA DLA NIEDZIEL (CZERWONY) */
+#editModal button[onclick*="'sunday'"]:active { 
+    background: rgba(255, 26, 26, 0.25) !important; 
+    transform: scale(0.95); 
+    filter: drop-shadow(0 0 8px var(--red)); 
+}
+
+/* EFEKT KLIKNIĘCIA DLA "ANULUJ" (BIAŁY/SZARY) */
+#editModal button[onclick*="closeAllModals()"]:active { 
+    background: rgba(255, 255, 255, 0.25) !important; 
+    border: 1px solid #fff !important;
+    transform: scale(0.95); 
+    filter: drop-shadow(0 0 12px #fff) brightness(1.3);
+}
+
+/* EFEKT KLIKNIĘCIA DLA "ZAPISZ" (BŁĘKITNY) */
+#editModal button[onclick*="saveDay()"]:active { 
+    background: rgba(0, 234, 255, 0.4) !important; 
+    transform: scale(0.95); 
+    filter: drop-shadow(0 0 8px var(--blue)); 
+}
 
 /* MODALE (ZJEDNOLICONA LOGIKA OVERLAY) */
 .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:150; }
