@@ -133,7 +133,8 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 /* STOPKA */
 .footer { flex-shrink: 0; background: var(--panel); padding: 15px; border-radius: 12px; border-top: 3px solid var(--green); }
 .total-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; }
-.btn-nav { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--blue); background: rgba(0,234,255,0.05); color: var(--blue); font-weight: bold; cursor: pointer; }
+.btn-nav { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--blue); background: rgba(0,234,255,0.05); color: var(--blue); font-weight: bold; cursor: pointer; position: relative; z-index: 10; -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease, background 0.1s ease; }
+.btn-nav:active { background: rgba(0, 234, 255, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
 
 /* MODALE (ZJEDNOLICONA LOGIKA OVERLAY) */
 .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:150; }
