@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -57,17 +57,43 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .date-day-name { width: 32px; text-align: left; }
 
 .saturday { color: var(--blue); }
-.saturday .edit-btn { fill: var(--blue); }
 .sunday { color: var(--red); }
-.sunday .edit-btn { fill: var(--red); }
 
 .today { background: rgba(255, 153, 0, 0.15) !important; color: var(--orange) !important; font-weight: bold; }
 .dayOff { opacity: 0.3; text-decoration: line-through; }
 .weekSummary { background: rgba(0,0,0,0.4); color: var(--green); font-weight: bold; font-size: 12px; }
 
-/* BIAŁE IKONKI Z EFEKTEM NEONOWEGO KLIKNIĘCIA */
-.edit-btn { width: 22px; height: 22px; fill: #ffffff; cursor: pointer; transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), fill 0.1s ease; display: block; margin: 0 auto; }
-.edit-btn:active { fill: var(--blue) !important; transform: scale(1.25); filter: drop-shadow(0 0 8px var(--blue)); }
+/* STYL I AKTYWNA ANIMACJA IKONY SUWAKÓW */
+.font-sliders-icon {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    fill: none;
+}
+.font-sliders-icon .slider-track { stroke: #ffffff; opacity: 0.4; transition: stroke 0.2s, opacity 0.2s; }
+.font-sliders-icon .slider-dot { 
+    fill: #ffffff; 
+    transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), fill 0.18s; 
+}
+
+/* Kolory ikon dla Sobót i Niedziel */
+.saturday .font-sliders-icon .slider-track { stroke: var(--blue); }
+.saturday .font-sliders-icon .slider-dot { fill: var(--blue); }
+.sunday .font-sliders-icon .slider-track { stroke: var(--red); }
+.sunday .font-sliders-icon .slider-dot { fill: var(--red); }
+
+/* STYL APLESKANY PO NACIŚNIĘCIU (DODAWANY PRZEZ JS) */
+.font-sliders-icon.animating .slider-track { opacity: 0.8; }
+.font-sliders-icon.animating .slider-dot { filter: drop-shadow(0 0 5px rgba(255,255,255,0.6)); }
+
+/* Górny suwak jedzie w lewo (-5px) */
+.font-sliders-icon.animating .line-top { transform: translateX(-5px); fill: var(--blue) !important; }
+/* Środkowy suwak jedzie w prawo (+5px) */
+.font-sliders-icon.animating .line-mid { transform: translateX(5px); fill: var(--green) !important; }
+/* Dolny suwak jedzie w lewo (-5px) */
+.font-sliders-icon.animating .line-bot { transform: translateX(-5px); fill: var(--blue) !important; }
 
 /* NOWY, POWIĘKSZONY NEONOWY DYMEK UMIESZCZONY CENTRALNIE */
 .neon-bubble-svg { 
@@ -135,8 +161,8 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .total-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; }
 .btn-nav { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--blue); background: rgba(0,234,255,0.05); color: var(--blue); font-weight: bold; cursor: pointer; position: relative; z-index: 10; -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease, background 0.1s ease; }
 .btn-nav:active { background: rgba(0, 234, 255, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
-    
-    /* PŁYNNE ZMIANY DLA PRZYCISKÓW W MODALU */
+
+/* PŁYNNE ZMIANY DLA PRZYCISKÓW W MODALU */
 #editModal button { transition: transform 0.1s ease, background 0.1s ease; -webkit-tap-highlight-color: transparent; }
 
 /* EFEKT KLIKNIĘCIA DLA ZIELONYCH (TYDEŃ, MIESIĄC) */
@@ -176,25 +202,85 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
     filter: drop-shadow(0 0 8px var(--blue)); 
 }
 
-/* MODALE (ZJEDNOLICONA LOGIKA OVERLAY) */
-.modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:150; }
+/* MODALE (PŁYNNE UNOWOCZEŚNIONE POJAWIANIE SIĘ I ZNIKANIE) */
+.modal-overlay { 
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0); 
+    z-index: 150; 
+    transition: background 0.2s ease;
+}
+.modal-overlay.show {
+    display: block;
+    background: rgba(0,0,0,0.85);
+}
 
-#editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel); padding: 20px; border: 2px solid var(--blue); z-index: 200; border-radius: 15px; width: 90%; max-width: 340px; box-shadow: 0 0 50px #000; max-height: 85vh; overflow-y: auto; }
+#editModal {
+    display: none; 
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    /* Domyślnie schowany, lekko przesunięty w dół i zmniejszony */
+    transform: translate(-50%, -40%) scale(0.9);
+    opacity: 0;
+    z-index: 200;
+    width: 90%;
+    max-width: 380px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid var(--blue);
+    box-shadow: 0 0 30px rgba(0, 234, 255, 0.2);
+    box-sizing: border-box;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--panel);
+    /* Przejście dla wyłaniania */
+    transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease-out;
+}
+#editModal.active-render {
+    display: block !important;
+}
+#editModal.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 1 !important;
+}
+
+/* PŁYNNE EMERGENCE DLA NOTATKI */
+#noteModal { 
+    display: none; 
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -40%) scale(0.9); 
+    opacity: 0;
+    background: var(--panel); 
+    padding: 22px; 
+    border: 2px solid var(--orange); 
+    z-index: 201; 
+    border-radius: 15px; 
+    width: 85%; 
+    max-width: 320px; 
+    box-shadow: 0 0 40px rgba(255, 153, 0, 0.25); 
+    transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease-out;
+}
+#noteModal.active-render {
+    display: block !important;
+}
+#noteModal.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 1 !important;
+}
+
 .time-row { display: flex; gap: 10px; margin-bottom: 5px; }
 .time-row input { background: #000; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; width: 100%; text-align: center; font-size: 15px; }
 .modal-label { display: block; font-size: 11px; color: var(--blue); margin-bottom: 3px; text-transform: uppercase; }
 .break-label { display: block; font-size: 10px; color: var(--green); margin: 8px 0 2px 0; font-weight: bold; }
 .note-textarea { width: 100%; background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; box-sizing: border-box; font-family: Arial; font-size: 13px; resize: none; height: 50px; margin-bottom: 10px; }
-    
+
 /* CENTROWANIE I OGRANICZENIE SZEROKOŚCI POLA STAWKI */
 .rate-input-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
 .rate-input-wrapper input { width: 100%; max-width: 120px; background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; text-align: center; font-size: 15px; }
-    
-
-/* MODAL DLA PODGLĄDU NOTATKI */
-#noteModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel); padding: 22px; border: 2px solid var(--orange); z-index: 201; border-radius: 15px; width: 85%; max-width: 320px; box-shadow: 0 0 40px rgba(255, 153, 0, 0.25); }
-.note-modal-title { margin: 0 0 14px 0; color: var(--orange); text-shadow: 0 0 8px rgba(255,153,0,0.4); text-align: center; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
-.note-modal-content { background: #000; border: 1px solid #333; color: #fff; padding: 14px; border-radius: 8px; font-size: 14px; line-height: 1.5; max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; margin-bottom: 15px; text-align: center; }
 </style>
 </head>
 <body>
@@ -254,24 +340,25 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 
 <div id="editModal">
     <h3 id="modalTitle" style="margin:0 0 15px 0; color:var(--blue); text-align:center;">Ustawienia</h3>
+    
     <div class="rate-input-wrapper">
-    <span class="modal-label">Stawka PLN/h:</span>
-    <input type="number" id="editRate" background:#000; color:#fff; border:1px solid #444; padding:10px; border-radius:6px; margin-bottom:15px;">
+        <span class="modal-label">Stawka PLN/h:</span>
+        <input type="number" id="editRate">
     </div>
     
     <span class="modal-label" style="font-weight:bold;">Godziny Pracy:</span>
     <div class="time-row"><input type="time" id="workStart"> <input type="time" id="workEnd"></div>
     
     <span class="modal-label" style="margin-top: 10px;">📝 Uwagi / Notatki do dnia:</span>
-    <textarea id="dayNote" class="note-textarea" placeholder="Np. dzień wolny, święto, wynagrodzenie itp."></textarea>
+    <textarea id="dayNote" class="note-textarea" placeholder="Np. dzień wolny, święto itp."></textarea>
     
     <div style="margin-top:5px; padding-top:10px; border-top:1px solid #444;">
         <span class="break-label">PRZERWA 1:</span>
-        <div class="time-row"><input type="time" id="editB1S"> <input type="time" id="editB1E"></div>
+        <div class="time-row"><input type="time" id="editB1S"><input type="time" id="editB1E"></div>
         <span class="break-label">PRZERWA 2:</span>
-        <div class="time-row"><input type="time" id="editB2S"> <input type="time" id="editB2E"></div>
+        <div class="time-row"><input type="time" id="editB2S"><input type="time" id="editB2E"></div>
         <span class="break-label">PRZERWA 3:</span>
-        <div class="time-row"><input type="time" id="editB3S"> <input type="time" id="editB3E"></div>
+        <div class="time-row"><input type="time" id="editB3S"><input type="time" id="editB3E"></div>
     </div>
 
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:15px 0 15px 0;">
@@ -285,12 +372,13 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         <button style="flex:1; padding:12px; background:none; color:white; border:1px solid #666; border-radius:8px;" onclick="closeAllModals()">Anuluj</button>
         <button style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
     </div>
-            <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%;">
-            <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">
-                WERSJA: 1.0.0
-            </span>
-        </div>
+    <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%;">
+        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">
+            WERSJA: 1.0.0
+        </span>
+    </div>
 </div>
+
 <div id="noteModal">
     <h3 class="note-modal-title" id="noteModalTitle">Notatka</h3>
     <div class="note-modal-content" id="noteModalContent"></div>
@@ -305,7 +393,16 @@ let viewDate = new Date();
 let daysData = {};
 let db = null;
 let currentEditingKey = null;
-const settingsIcon = `<svg class="edit-btn" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>`;
+
+const settingsIcon = `
+<svg class="font-sliders-icon" viewBox="0 0 24 24">
+    <path class="slider-track" d="M3 6h18" stroke-width="2" stroke-linecap="round"/>
+    <circle class="slider-dot line-top" cx="9" cy="6" r="2.5"/>
+    <path class="slider-track" d="M3 12h18" stroke-width="2" stroke-linecap="round"/>
+    <circle class="slider-dot line-mid" cx="15" cy="12" r="2.5"/>
+    <path class="slider-track" d="M3 18h18" stroke-width="2" stroke-linecap="round"/>
+    <circle class="slider-dot line-bot" cx="9" cy="18" r="2.5"/>
+</svg>`;
 
 function getKey(date) { return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(); }
 
@@ -477,6 +574,22 @@ function importData(event) {
     event.target.value = "";
 }
 
+function triggerSettingsWithAnimation(tdElement, key) {
+    const svgIcon = tdElement.querySelector('.font-sliders-icon');
+    if (!svgIcon) return;
+
+    svgIcon.classList.add('animating');
+
+    setTimeout(() => {
+        svgIcon.classList.remove('animating');
+        
+        setTimeout(() => {
+            openEdit(key);
+        }, 180);
+
+    }, 180);
+}
+
 function openEdit(key) {
     currentEditingKey = key;
     const data = daysData[key] || {rate: 80, work: 1, start: "00:00", end: "00:00", customBreaks: [], note: ""};
@@ -489,22 +602,53 @@ function openEdit(key) {
         const b = (data.customBreaks && data.customBreaks[i-1]) ? data.customBreaks[i-1] : ["", ""];
         document.getElementById(`editB${i}S`).value = b[0]; document.getElementById(`editB${i}E`).value = b[1];
     }
-    document.getElementById("editModal").style.display = "block";
-    document.getElementById("overlay").style.display = "block";
+    
+    // PŁYNNE GENEROWANIE EMERGENCE
+    const overlay = document.getElementById("overlay");
+    const editModal = document.getElementById("editModal");
+    
+    overlay.style.display = "block";
+    editModal.classList.add("active-render");
+    
+    // Wymuszenie odświeżenia drzewa DOM przed nadaniem klas animacyjnych
+    setTimeout(() => {
+        overlay.classList.add("show");
+        editModal.classList.add("show");
+    }, 10);
 }
 
 function openNoteModal(key) {
     if (!daysData[key] || !daysData[key].note) return;
     document.getElementById("noteModalTitle").textContent = "Notatka z dnia " + key;
     document.getElementById("noteModalContent").textContent = daysData[key].note;
-    document.getElementById("noteModal").style.display = "block";
-    document.getElementById("overlay").style.display = "block";
+    
+    const overlay = document.getElementById("overlay");
+    const noteModal = document.getElementById("noteModal");
+    
+    overlay.style.display = "block";
+    noteModal.classList.add("active-render");
+    
+    setTimeout(() => {
+        overlay.classList.add("show");
+        noteModal.classList.add("show");
+    }, 10);
 }
 
 function closeAllModals() { 
-    document.getElementById("editModal").style.display = "none"; 
-    document.getElementById("noteModal").style.display = "none"; 
-    document.getElementById("overlay").style.display = "none"; 
+    const overlay = document.getElementById("overlay");
+    const editModal = document.getElementById("editModal");
+    const noteModal = document.getElementById("noteModal");
+    
+    overlay.classList.remove("show");
+    editModal.classList.remove("show");
+    noteModal.classList.remove("show");
+    
+    // Ukrycie elementów z display: none dopiero po zakończeniu animacji CSS (220ms)
+    setTimeout(() => {
+        if (!editModal.classList.contains("show")) editModal.classList.remove("active-render");
+        if (!noteModal.classList.contains("show")) noteModal.classList.remove("active-render");
+        if (!overlay.classList.contains("show")) overlay.style.display = "none";
+    }, 220);
 }
 
 function saveDay() {
@@ -624,8 +768,7 @@ function render() {
         }
         if(daysData[key].work === 0) tr.className += " dayOff";
         
-        /* NOWA STRUKTURA: NUMER - DYMEK (LUB ODSTĘP) - NAZWA DNIA */
-        let neonBubbleElement = `<div style="width:20px; height:17px; flex-shrink:0;"></div>`; // puste wolne miejsce gdy brak notatki
+        let neonBubbleElement = `<div style="width:20px; height:17px; flex-shrink:0;"></div>`;
         if (daysData[key].note && daysData[key].note.trim() !== "") {
             notesCount++;
             neonBubbleElement = `
@@ -650,11 +793,11 @@ function render() {
             </td>
             <td>${h.toFixed(2)}</td>
             <td>${mv.toFixed(0)}</td>
-            <td onclick="openEdit('${key}')">${settingsIcon}</td>
+            <td onclick="triggerSettingsWithAnimation(this, '${key}')">${settingsIcon}</td>
         `;
         
         tr.onclick = (e) => { 
-            if(e.target.closest('.edit-btn') || e.target.cellIndex === 2) return; 
+            if(e.target.closest('.font-sliders-icon') || e.target.closest('td').cellIndex === 4) return; 
             
             if(e.target.classList.contains('neon-bubble-svg') || e.target.closest('.neon-bubble-svg')) {
                 openNoteModal(key);
@@ -805,8 +948,8 @@ initDB().then(() => {
         setInterval(updateWeather, 900000);
     });
 });
-
 </script>
 
 </body>
 </html>
+     
