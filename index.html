@@ -262,7 +262,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         <button style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
     </div>
     <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%;">
-        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.0.7</span>
+        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.0.8</span>
     </div>
 </div>
 
@@ -648,6 +648,10 @@ function render() {
     staticTotalHours = 0;
     staticTotalMoney = 0;
     let nowObj = new Date();
+    
+    // Tworzymy czysty punkt odniesienia dla "dzisiaj" o północy, by łatwo filtrować przyszłość
+    let todayMidnight = new Date(nowObj.getFullYear(), nowObj.getMonth(), nowObj.getDate(), 0, 0, 0);
+    
     let todayKey = getKey(nowObj);
     let yesterdayObj = new Date(nowObj); yesterdayObj.setDate(yesterdayObj.getDate() - 1);
     let yesterdayKey = getKey(yesterdayObj);
@@ -663,11 +667,13 @@ function render() {
         
         let isToday = (key === todayKey);
         let isYesterday = (key === yesterdayKey);
-        let h = 0; let mv = 0;
+        let isFuture = (date > todayMidnight && !isToday); // Sprawdzamy czy to czysta przyszłość
         
+        let h = 0; let mv = 0;
         let isLiveManaged = isToday || (isYesterday && daysData[key].end && daysData[key].start && Number(daysData[key].end.split(":")[0]) <= Number(daysData[key].start.split(":")[0]));
         
-        if (!isLiveManaged) {
+        // Obliczamy godziny tylko jeśli dzień nie jest zarządzany na żywo i NIE JEST przyszłością
+        if (!isLiveManaged && !isFuture) {
             let targetEvalTime = new Date(y, m, d, 23, 59, 59);
             if (daysData[key].end && daysData[key].start && Number(daysData[key].end.split(":")[0]) <= Number(daysData[key].start.split(":")[0])) {
                 targetEvalTime.setDate(targetEvalTime.getDate() + 1);
@@ -698,6 +704,11 @@ function render() {
         }
 
         const dayNameStr = date.toLocaleDateString('pl-PL',{weekday:'short'});
+        
+        // Dla przyszłych dni na sztywno wyświetlamy 0:00 i 0.00 w tabeli
+        let displayHours = (isLiveManaged) ? '0:00' : (isFuture ? '0:00' : formatHoursToHM(h));
+        let displayMoney = (isLiveManaged) ? '0.00' : (isFuture ? '0.00' : mv.toFixed(2));
+
         tr.innerHTML = `
             <td colspan="2">
                 <div class="date-row-container">
@@ -706,8 +717,8 @@ function render() {
                     <span class="date-day-name">${dayNameStr}</span>
                 </div>
             </td>
-            <td ${isLiveManaged ? `id="live-managed-hours-${key}" data-key="${key}"` : ''}>${isLiveManaged ? '0:00' : formatHoursToHM(h)}</td>
-            <td ${isLiveManaged ? `id="live-managed-money-${key}"` : ''}>${isLiveManaged ? '0.00' : mv.toFixed(2)}</td>
+            <td ${isLiveManaged ? `id="live-managed-hours-${key}" data-key="${key}"` : ''}>${displayHours}</td>
+            <td ${isLiveManaged ? `id="live-managed-money-${key}"` : ''}>${displayMoney}</td>
             <td onclick="triggerSettingsWithAnimation(this, '${key}')">${settingsIcon}</td>
         `;
         
@@ -719,7 +730,7 @@ function render() {
         };
         tbody.appendChild(tr);
 
-        if (!isLiveManaged) { currentWeekH += h; currentWeekM += mv; }
+        if (!isLiveManaged && !isFuture) { currentWeekH += h; currentWeekM += mv; }
 
         if(dw === 0 || d === lastDay) {
             let weekTr = document.createElement("tr"); weekTr.className = "weekSummary";
