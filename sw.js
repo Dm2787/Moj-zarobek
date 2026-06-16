@@ -1,4 +1,4 @@
-const CACHE_NAME = 'czas-pracy-v8'; // Zmieniłem wersję na v3, żeby zmusić przeglądarkę do odświeżenia cache
+const CACHE_NAME = 'czas-pracy-v9'; // Zmieniłem wersję na v3, żeby zmusić przeglądarkę do odświeżenia cache
 const FILES_TO_CACHE = [
   './',
   './index.html',
