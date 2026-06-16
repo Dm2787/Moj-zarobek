@@ -257,7 +257,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         <button style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
     </div>
     <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%;">
-        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.2.4</span>
+        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.2.5</span>
     </div>
 </div>
 
@@ -648,6 +648,7 @@ function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
     let totalMs = finish - start;
     
     (dayObj.customBreaks || []).forEach((b, idx) => {
+        if (!b[0] || !b[1]) return; // Poprawka błędu przerw na GitHubie: pomiń jeśli pusty ciąg
         if (dayObj.breaksPaidFlags && dayObj.breaksPaidFlags[idx] === true) return;
         let bStartParts = b[0].split(":").map(Number);
         let bEndParts = b[1].split(":").map(Number);
@@ -796,6 +797,11 @@ function render() {
     const globalWrapper = document.getElementById("globalMonthBubbleWrapper");
     const globalCountText = document.getElementById("globalBubbleCount");
     if (notesCount > 0) { globalCountText.textContent = notesCount; globalWrapper.style.display = "flex"; } else { globalWrapper.style.display = "none"; }
+    
+    // Zawsze wrzucaj na start wartości statyczne dla bieżącego widoku miesiąca
+    document.getElementById("totalHours").textContent = formatHoursToHM(staticTotalHours);
+    document.getElementById("totalMoney").textContent = staticTotalMoney.toFixed(2);
+    
     triggerLiveUpdate();
 }
 
@@ -865,6 +871,7 @@ function triggerLiveUpdate() {
         }
     });
 
+    // Poprawka błędu podsumowań miesięcy historycznych: live-update modyfikuje stopkę tylko, gdy oglądamy AKTUALNY miesiąc
     if (viewDate.getMonth() === now.getMonth() && viewDate.getFullYear() === now.getFullYear()) {
         document.getElementById("totalHours").textContent = formatHoursToHM(staticTotalHours + temporaryLiveHoursSum);
         document.getElementById("totalMoney").textContent = (staticTotalMoney + temporaryLiveMoneySum).toFixed(2);
@@ -985,6 +992,7 @@ setInterval(() => {
             
             let currentBreak = null; let nextBreak = null;
             (dObj.customBreaks || []).forEach(b => {
+                if (!b[0] || !b[1]) return; // Pomijamy puste przerwy, żeby nie psuły odliczania na żywo
                 let bStartParts = b[0].split(":").map(Number);
                 let bEndParts = b[1].split(":").map(Number);
                 let bs = new Date(parts[0], parts[1] - 1, parts[2], bStartParts[0], bStartParts[1], 0, 0);
