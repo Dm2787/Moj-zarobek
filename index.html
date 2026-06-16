@@ -110,14 +110,14 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .btn-nav { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--blue); background: rgba(0,234,255,0.05); color: var(--blue); font-weight: bold; cursor: pointer; position: relative; z-index: 10; -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease, background 0.1s ease; }
 .btn-nav:active { background: rgba(0, 234, 255, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
 
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); z-index: 150; transition: background 0.2s ease; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); z-index: 150; transition: background 0.25s ease; }
 .modal-overlay.show { display: block; background: rgba(0,0,0,0.85); }
 
-#editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.9); opacity: 0; z-index: 200; width: 90%; max-width: 380px; padding: 20px; border-radius: 12px; border: 2px solid var(--blue); box-shadow: 0 0 30px rgba(0, 234, 255, 0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; background: var(--panel); transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease-out; }
+#editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -45%) scale(0.92); opacity: 0; z-index: 200; width: 90%; max-width: 380px; padding: 20px; border-radius: 12px; border: 2px solid var(--blue); box-shadow: 0 0 30px rgba(0, 234, 255, 0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; background: var(--panel); transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease-out; will-change: transform, opacity; }
 #editModal.active-render { display: block !important; }
 #editModal.show { transform: translate(-50%, -50%) scale(1) !important; opacity: 1 !important; }
 
-#noteModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.9); opacity: 0; background: var(--panel); padding: 22px; border: 2px solid var(--orange); z-index: 201; border-radius: 15px; width: 85%; max-width: 320px; box-shadow: 0 0 40px rgba(255, 153, 0, 0.25); transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease-out; }
+#noteModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -45%) scale(0.92); opacity: 0; background: var(--panel); padding: 22px; border: 2px solid var(--orange); z-index: 201; border-radius: 15px; width: 85%; max-width: 320px; box-shadow: 0 0 40px rgba(255, 153, 0, 0.25); transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease-out; will-change: transform, opacity; }
 #noteModal.active-render { display: block !important; }
 #noteModal.show { transform: translate(-50%, -50%) scale(1) !important; opacity: 1 !important; }
 #noteModalContent { white-space: pre-wrap; word-break: break-word; margin-bottom: 20px; line-height: 1.5; color: #fff; font-size: 14px; text-align: left; }
@@ -257,7 +257,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         <button style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
     </div>
     <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%;">
-        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.2.2</span>
+        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.2.4</span>
     </div>
 </div>
 
@@ -467,7 +467,7 @@ function triggerSettingsWithAnimation(tdElement, key) {
     svgIcon.classList.add('animating');
     setTimeout(() => {
         svgIcon.classList.remove('animating');
-        setTimeout(() => { openEdit(key); }, 180);
+        openEdit(key);
     }, 180);
 }
 
@@ -517,12 +517,16 @@ function openEdit(key) {
     
     const overlay = document.getElementById("overlay");
     const editModal = document.getElementById("editModal");
+    
     overlay.style.display = "block";
     editModal.classList.add("active-render");
-    setTimeout(() => {
-        overlay.classList.add("show");
-        editModal.classList.add("show");
-    }, 10);
+    
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            overlay.classList.add("show");
+            editModal.classList.add("show");
+        });
+    });
 }
 
 function openNoteModal(key) {
@@ -534,26 +538,32 @@ function openNoteModal(key) {
     
     const overlay = document.getElementById("overlay");
     const noteModal = document.getElementById("noteModal");
+    
     overlay.style.display = "block";
     noteModal.classList.add("active-render");
-    setTimeout(() => {
-        overlay.classList.add("show");
-        noteModal.classList.add("show");
-    }, 10);
+    
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            overlay.classList.add("show");
+            noteModal.classList.add("show");
+        });
+    });
 }
 
 function closeAllModals() { 
     const overlay = document.getElementById("overlay");
     const editModal = document.getElementById("editModal");
     const noteModal = document.getElementById("noteModal");
+    
     overlay.classList.remove("show");
     editModal.classList.remove("show");
     noteModal.classList.remove("show");
+    
     setTimeout(() => {
         if (!editModal.classList.contains("show")) editModal.classList.remove("active-render");
         if (!noteModal.classList.contains("show")) noteModal.classList.remove("active-render");
         if (!overlay.classList.contains("show")) overlay.style.display = "none";
-    }, 220);
+    }, 250);
 }
 
 function saveDay() {
@@ -965,10 +975,14 @@ setInterval(() => {
         let liveHours = calculateWork(now, dObj, activeKey);
         document.getElementById("todayWork").textContent = `Dziś przepracowano: ${formatHoursToHM(liveHours)} H`;
 
-        if(now >= s && now <= e) {
+        if (now > e) {
+            document.getElementById("progress-bar").style.width = "100%";
+            document.getElementById("todayWork").innerHTML = '<span style="color:#ffd700;">FAJRANT! 🍻</span>';
+            breakInfo = ""; 
+        } 
+        else if (now >= s && now <= e) {
             document.getElementById("progress-bar").style.width = ((now - s) / (e - s) * 100) + "%";
             
-            // ODLICZANIE DO PRZERWY (TYLKO W TRAKCIE PRACY)
             let currentBreak = null; let nextBreak = null;
             (dObj.customBreaks || []).forEach(b => {
                 let bStartParts = b[0].split(":").map(Number);
@@ -992,20 +1006,10 @@ setInterval(() => {
             } else if(nextBreak) {
                 breakInfo = `Przerwa za: ${formatTimeLeft(nextBreak - now)}`;
             }
-        } else if (now > e) {
-            // FAJRANT - CAŁKOWITE WYŁĄCZENIE TIMERA PRZERW
-            document.getElementById("progress-bar").style.width = "100%";
-            document.getElementById("todayWork").innerHTML = '<span style="color:#ffd700;">FAJRANT! 🍻</span>';
-            breakInfo = ""; 
-        } else if (now < s) {
+        } 
+        else if (now < s) {
             document.getElementById("progress-bar").style.width = "0%";
-            
-            // DNIÓWKI: POKAZUJ ODPOWIEDNI START DOPIERO PO PÓŁNOCY W DZIEŃ PRACY
-            if (dObj.isNightShift === false) {
-                document.getElementById("todayWork").innerHTML = `<span style="color:var(--blue);">Start za: ${formatTimeLeft(s - now)}</span>`;
-            } else {
-                document.getElementById("todayWork").innerHTML = `<span style="color:var(--blue);">Start za: ${formatTimeLeft(s - now)}</span>`;
-            }
+            document.getElementById("todayWork").innerHTML = `<span style="color:var(--blue);">Start za: ${formatTimeLeft(s - now)}</span>`;
             breakInfo = "";
         }
     } else {
