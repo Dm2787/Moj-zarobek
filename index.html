@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Czas pracy">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="icon.png">
+<link class="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
 
 <style>
@@ -18,6 +18,15 @@
 html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); overflow: hidden; }
 body { color: white; font-family: Arial; display: flex; flex-direction: column; padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) 10px; box-sizing: border-box; }
 .container { max-width: 480px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; height: 100%; position: relative; }
+
+/* BLOKADA ORIENTACJI POZIOMEJ (WYMUSZENIE PIONU) */
+.orientation-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; font-family: Arial; padding: 20px; box-sizing: border-box; }
+.orientation-warning svg { width: 50px; height: 50px; fill: var(--orange); margin-bottom: 15px; animation: rotate-phone 2s infinite ease-in-out; }
+@keyframes rotate-phone { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+
+@media screen and (orientation: landscape) {
+    .orientation-warning { display: flex; }
+}
 
 /* USUNIĘCIE STRZĘPKÓW SYSTEMOWEGO PODŚWIETLENIA I BLOKADA ZAZNACZANIA */
 * { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
@@ -64,91 +73,40 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .weekSummary { background: rgba(0,0,0,0.4); color: var(--green); font-weight: bold; font-size: 12px; }
 
 /* STYL I AKTYWNA ANIMACJA IKONY SUWAKÓW */
-.font-sliders-icon {
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    display: block;
-    margin: 0 auto;
-    fill: none;
-}
+.font-sliders-icon { width: 22px; height: 22px; cursor: pointer; display: block; margin: 0 auto; fill: none; }
 .font-sliders-icon .slider-track { stroke: #ffffff; opacity: 0.4; transition: stroke 0.2s, opacity 0.2s; }
-.font-sliders-icon .slider-dot { 
-    fill: #ffffff; 
-    transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), fill 0.18s; 
-}
+.font-sliders-icon .slider-dot { fill: #ffffff; transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), fill 0.18s; }
 
-/* Kolory ikon dla Sobót i Niedziel */
 .saturday .font-sliders-icon .slider-track { stroke: var(--blue); }
 .saturday .font-sliders-icon .slider-dot { fill: var(--blue); }
 .sunday .font-sliders-icon .slider-track { stroke: var(--red); }
 .sunday .font-sliders-icon .slider-dot { fill: var(--red); }
 
-/* STYL APLESKANY PO NACIŚNIĘCIU (DODAWANY PRZEZ JS) */
 .font-sliders-icon.animating .slider-track { opacity: 0.8; }
 .font-sliders-icon.animating .slider-dot { filter: drop-shadow(0 0 5px rgba(255,255,255,0.6)); }
-
-/* Górny suwak jedzie w lewo (-5px) */
 .font-sliders-icon.animating .line-top { transform: translateX(-5px); fill: var(--blue) !important; }
-/* Środkowy suwak jedzie w prawo (+5px) */
 .font-sliders-icon.animating .line-mid { transform: translateX(5px); fill: var(--green) !important; }
-/* Dolny suwak jedzie w lewo (-5px) */
 .font-sliders-icon.animating .line-bot { transform: translateX(-5px); fill: var(--blue) !important; }
 
-/* NOWY, POWIĘKSZONY NEONOWY DYMEK UMIESZCZONY CENTRALNIE */
-.neon-bubble-svg { 
-    width: 20px; 
-    height: 17px; 
-    filter: drop-shadow(0 0 4px var(--orange)); 
-    cursor: help; 
-    flex-shrink: 0;
-    transition: transform 0.1s ease, filter 0.1s ease;
-}
+.neon-bubble-svg { width: 20px; height: 17px; filter: drop-shadow(0 0 4px var(--orange)); cursor: help; flex-shrink: 0; transition: transform 0.1s ease, filter 0.1s ease; }
+.neon-bubble-svg:active { transform: scale(1.3); filter: drop-shadow(0 0 10px var(--orange)) brightness(1.3); }
 
-/* ROZBUDOWANY EFEKT PULSOWANIA I NEONU PRZY KLIKNIĘCIU W DYMEK */
-.neon-bubble-svg:active {
-    transform: scale(1.3);
-    filter: drop-shadow(0 0 10px var(--orange)) brightness(1.3);
-}
-
-/* GLOBALNY KONTENER NA IKONĘ OBOK TEKSTU W NAGŁÓWKU */
-.global-bubble-wrapper {
-    display: none;
-    align-items: center;
-    gap: 6px;
-}
-
-/* GLOBALNA IKONA IDENTYCZNA Z TĄ Z TABELI */
-.global-bubble-svg {
-    width: 16px;
-    height: 14px;
-    filter: drop-shadow(0 0 3px var(--orange));
-}
-
-/* CYFRA WYŚWIETLANA OBOK IKONY */
-.global-bubble-text {
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--orange);
-    text-shadow: 0 0 5px var(--orange);
-}
+.global-bubble-wrapper { display: none; align-items: center; gap: 6px; }
+.global-bubble-svg { width: 16px; height: 14px; filter: drop-shadow(0 0 3px var(--orange)); }
+.global-bubble-text { font-size: 14px; font-weight: bold; color: var(--orange); text-shadow: 0 0 5px var(--orange); }
 
 /* DOLNY PANEL BACKUPU */
 .backup-footer-row { display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0; }
 .btn-backup { flex: 1; background: rgba(0, 234, 255, 0.03); border: 1px solid rgba(0, 234, 255, 0.3); color: #a0e6ff; font-size: 12px; font-weight: bold; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; }
 .btn-backup:active { background: rgba(0, 234, 255, 0.15); }
-
-/* AGRESYWNY ALARM NEONOWEJ CZERWIENI */
 .btn-backup.needs-backup { background: rgba(255, 26, 26, 0.25) !important; border: 2px solid #ff1a1a !important; color: #ffffff !important; font-weight: 900; animation: pulse-emergency 1.2s infinite ease-in-out; }
 
-/* ANIMACJA DIODY ALARMOWEJ */
 @keyframes pulse-emergency {
     0% { box-shadow: 0 0 2px rgba(255, 26, 26, 0.4); background: rgba(255, 26, 26, 0.2); }
     50% { box-shadow: 0 0 16px rgba(255, 26, 26, 0.85); background: rgba(255, 26, 26, 0.4); border-color: #ff6666 !important; }
     100% { box-shadow: 0 0 2px rgba(255, 26, 26, 0.4); background: rgba(255, 26, 26, 0.2); }
 }
 
-/* ANIMACJA PULSUJĄCEGO TRÓJKĄTA */
 .warning-triangle { display: inline-block; font-size: 14px; animation: breathe-triangle 1.2s infinite ease-in-out; margin-right: 2px; }
 @keyframes breathe-triangle {
     0% { transform: scale(1); }
@@ -162,139 +120,51 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .btn-nav { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--blue); background: rgba(0,234,255,0.05); color: var(--blue); font-weight: bold; cursor: pointer; position: relative; z-index: 10; -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease, background 0.1s ease; }
 .btn-nav:active { background: rgba(0, 234, 255, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
 
-/* PŁYNNE ZMIANY DLA PRZYCISKÓW W MODALU */
-#editModal button { transition: transform 0.1s ease, background 0.1s ease; -webkit-tap-highlight-color: transparent; }
+/* MODALE */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); z-index: 150; transition: background 0.2s ease; }
+.modal-overlay.show { display: block; background: rgba(0,0,0,0.85); }
 
-/* EFEKT KLIKNIĘCIA DLA ZIELONYCH (TYDEŃ, MIESIĄC) */
-#editModal button[onclick*="'week'"]:active, 
-#editModal button[onclick*="'month'"]:active { 
-    background: rgba(0, 255, 166, 0.25) !important; 
-    transform: scale(0.95); 
-    filter: drop-shadow(0 0 8px var(--green)); 
-}
+#editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.9); opacity: 0; z-index: 200; width: 90%; max-width: 380px; padding: 20px; border-radius: 12px; border: 2px solid var(--blue); box-shadow: 0 0 30px rgba(0, 234, 255, 0.2); box-sizing: border-box; max-height: 90vh; overflow-y: auto; background: var(--panel); transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease-out; }
+#editModal.active-render { display: block !important; }
+#editModal.show { transform: translate(-50%, -50%) scale(1) !important; opacity: 1 !important; }
 
-/* EFEKT KLIKNIĘCIA DLA SOBÓT (BŁĘKITNY) */
-#editModal button[onclick*="'saturday'"]:active { 
-    background: rgba(0, 234, 255, 0.25) !important; 
-    transform: scale(0.95); 
-    filter: drop-shadow(0 0 8px var(--blue)); 
-}
-
-/* EFEKT KLIKNIĘCIA DLA NIEDZIEL (CZERWONY) */
-#editModal button[onclick*="'sunday'"]:active { 
-    background: rgba(255, 26, 26, 0.25) !important; 
-    transform: scale(0.95); 
-    filter: drop-shadow(0 0 8px var(--red)); 
-}
-
-/* EFEKT KLIKNIĘCIA DLA "ANULUJ" (BIAŁY/SZARY) */
-#editModal button[onclick*="closeAllModals()"]:active { 
-    background: rgba(255, 255, 255, 0.25) !important; 
-    border: 1px solid #fff !important;
-    transform: scale(0.95); 
-    filter: drop-shadow(0 0 12px #fff) brightness(1.3);
-}
-
-/* EFEKT KLIKNIĘCIA DLA "ZAPISZ" (BŁĘKITNY) */
-#editModal button[onclick*="saveDay()"]:active { 
-    background: rgba(0, 234, 255, 0.4) !important; 
-    transform: scale(0.95); 
-    filter: drop-shadow(0 0 8px var(--blue)); 
-}
-
-/* MODALE (PŁYNNE UNOWOCZEŚNIONE POJAWIANIE SIĘ I ZNIKANIE) */
-.modal-overlay { 
-    display: none; 
-    position: fixed; 
-    top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0); 
-    z-index: 150; 
-    transition: background 0.2s ease;
-}
-.modal-overlay.show {
-    display: block;
-    background: rgba(0,0,0,0.85);
-}
-
-#editModal {
-    display: none; 
-    position: fixed; 
-    top: 50%; 
-    left: 50%; 
-    /* Domyślnie schowany, lekko przesunięty w dół i zmniejszony */
-    transform: translate(-50%, -40%) scale(0.9);
-    opacity: 0;
-    z-index: 200;
-    width: 90%;
-    max-width: 380px;
-    padding: 20px;
-    border-radius: 12px;
-    border: 2px solid var(--blue);
-    box-shadow: 0 0 30px rgba(0, 234, 255, 0.2);
-    box-sizing: border-box;
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--panel);
-    /* Przejście dla wyłaniania */
-    transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease-out;
-}
-
-#noteModalContent {
-    white-space: pre-wrap;
-    word-break: break-word;
-    margin-bottom: 20px;
-    line-height: 1.5;
-    color: #fff;
-    font-size: 14px;
-    text-align: left;
-}
-
-#editModal.active-render {
-    display: block !important;
-}
-#editModal.show {
-    transform: translate(-50%, -50%) scale(1) !important;
-    opacity: 1 !important;
-}
-
-/* PŁYNNE EMERGENCE DLA NOTATKI */
-#noteModal { 
-    display: none; 
-    position: fixed; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -40%) scale(0.9); 
-    opacity: 0;
-    background: var(--panel); 
-    padding: 22px; 
-    border: 2px solid var(--orange); 
-    z-index: 201; 
-    border-radius: 15px; 
-    width: 85%; 
-    max-width: 320px; 
-    box-shadow: 0 0 40px rgba(255, 153, 0, 0.25); 
-    transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease-out;
-}
-#noteModal.active-render {
-    display: block !important;
-}
-#noteModal.show {
-    transform: translate(-50%, -50%) scale(1) !important;
-    opacity: 1 !important;
-}
+#noteModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.9); opacity: 0; background: var(--panel); padding: 22px; border: 2px solid var(--orange); z-index: 201; border-radius: 15px; width: 85%; max-width: 320px; box-shadow: 0 0 40px rgba(255, 153, 0, 0.25); transition: transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.22s ease-out; }
+#noteModal.active-render { display: block !important; }
+#noteModal.show { transform: translate(-50%, -50%) scale(1) !important; opacity: 1 !important; }
+#noteModalContent { white-space: pre-wrap; word-break: break-word; margin-bottom: 20px; line-height: 1.5; color: #fff; font-size: 14px; text-align: left; }
 
 .time-row { display: flex; gap: 10px; margin-bottom: 5px; }
 .time-row input { background: #000; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; width: 100%; text-align: center; font-size: 15px; }
 .modal-label { display: block; font-size: 11px; color: var(--blue); margin-bottom: 3px; text-transform: uppercase; }
-.break-label { display: block; font-size: 10px; color: var(--green); margin: 8px 0 2px 0; font-weight: bold; }
 .note-textarea { width: 100%; background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; box-sizing: border-box; font-family: Arial; font-size: 13px; resize: none; height: 50px; margin-bottom: 10px; }
 
-/* CENTROWANIE I OGRANICZENIE SZEROKOŚCI POLA STAWKI */
 .rate-input-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
 .rate-input-wrapper input { width: 100%; max-width: 120px; background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; text-align: center; font-size: 15px; }
+
+/* KONTENER NAGŁÓWKA DLA PRZERWY Z PRZYCISKIEM TYPU TOGGLE */
+.break-header-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0 2px 0; }
+.break-label { font-size: 10px; color: var(--green); font-weight: bold; text-transform: uppercase; }
+
+/* PRZYCISK PŁATNA / BEZPŁATNA PRZERWA */
+.btn-toggle-break { background: rgba(255, 26, 26, 0.1); border: 1px solid var(--red); color: var(--red); font-size: 9px; font-weight: bold; padding: 3px 8px; border-radius: 20px; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.5px; }
+.btn-toggle-break.paid { background: rgba(0, 255, 166, 0.15); border: 1px solid var(--green); color: var(--green); box-shadow: 0 0 5px rgba(0, 255, 166, 0.2); }
+
+#editModal button { transition: transform 0.1s ease, background 0.1s ease; -webkit-tap-highlight-color: transparent; }
+#editModal button[onclick*="'week'"]:active, #editModal button[onclick*="'month'"]:active { background: rgba(0, 255, 166, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--green)); }
+#editModal button[onclick*="'saturday'"]:active { background: rgba(0, 234, 255, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
+#editModal button[onclick*="closeAllModals()"]:active { background: rgba(255, 255, 255, 0.25) !important; border: 1px solid #fff !important; transform: scale(0.95); filter: drop-shadow(0 0 12px #fff) brightness(1.3); }
+#editModal button[onclick*="saveDay()"]:active { background: rgba(0, 234, 255, 0.4) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
 </style>
 </head>
 <body>
+
+<div class="orientation-warning">
+    <svg viewBox="0 0 24 24">
+        <path d="M16 1H8C6.34 1 5 2.34 5 4v16c0 1.66 1.34 3 3 3h8c1.66 0 3-1.34 3-3V4c0-1.66-1.34-3-3-3zm-4 21c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm5.25-3H6.75V4h10.5s0 15 0 15z"/>
+    </svg>
+    <div style="font-weight: bold; font-size: 16px; margin-bottom: 5px;">Obróć urządzenie</div>
+    <div style="font-size: 12px; color: #888;">Aplikacja działa wyłącznie w pozycji pionowej.</div>
+</div>
 
 <div class="container">
     <div class="header">
@@ -303,7 +173,6 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         
         <div class="month-title-container">
             <div id="monthTitle">---</div>
-            
             <div id="globalMonthBubbleWrapper" class="global-bubble-wrapper">
                 <svg class="global-bubble-svg" viewBox="0 0 24 20">
                     <path d="M2 5 C2 2, 4 2, 7 2 L17 2 C20 2, 22 2, 22 5 L22 13 C22 16, 20 16, 17 16 L7 16 L3 19 L3 16 C2 16, 2 15, 2 13 Z" fill="#0b0f14" stroke="var(--orange)" stroke-width="1.8" stroke-linejoin="round"/>
@@ -316,7 +185,6 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         </div>
         
         <div id="weather-info">Pobieram lokalizację...</div>
-        
         <div class="progress-container"><div id="progress-bar"></div></div>
         <div class="todayWork" id="todayWork">--</div>
         <div class="break-timer" id="breakTimer"></div>
@@ -332,12 +200,12 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
     <div class="backup-footer-row">
         <button class="btn-backup" id="exportBtn" onclick="exportData()"><span id="exportIcon" style="display:inline-block;">📤</span> <span id="exportText">EKSPORT</span></button>
         <button class="btn-backup" onclick="document.getElementById('importFile').click()">📥 IMPORT</button>
-        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
     </div>
 
     <div class="footer">
-        <div class="total-row"><span>Suma godzin:</span><span id="totalHours" style="color:var(--green);">0.00</span></div>
-        <div class="total-row"><span>Zarobek:</span><span id="totalMoney" style="color:var(--green);">0 zł</span></div>
+        <div class="total-row"><span>Suma godzin:</span><span id="totalHours" style="color:var(--green);">0:00</span></div>
+        <div class="total-row"><span>Zarobek:</span><span id="totalMoney" style="color:var(--green);">0.00</span></div>
         <div style="display:flex; gap:12px; margin-top:10px;">
             <button class="btn-nav" onclick="changeMonth(-1)">◀ POPRZEDNI</button>
             <button class="btn-nav" onclick="changeMonth(1)">NASTĘPNY ▶</button>
@@ -346,11 +214,10 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 </div>
 
 <div id="toast" class="toast-container"></div>
-
 <div class="modal-overlay" id="overlay" onclick="closeAllModals()"></div>
 
 <div id="editModal">
-    <h3 id="modalTitle" style="margin:0 0 15px 0; color:var(--blue); text-align:center;">Ustawienia</h3>
+    <h3 id="modalTitle" style="margin:0 0 15px 0; color:var(--blue); text-align:center; font-size: 16px;">Ustawienia</h3>
     
     <div class="rate-input-wrapper">
         <span class="modal-label">Stawka PLN/h:</span>
@@ -363,12 +230,23 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
     <span class="modal-label" style="margin-top: 10px;">📝 Uwagi / Notatki do dnia:</span>
     <textarea id="dayNote" class="note-textarea" placeholder="Np. dzień wolny, święto itp."></textarea>
     
-    <div style="margin-top:5px; padding-top:10px; border-top:1px solid #444;">
-        <span class="break-label">PRZERWA 1:</span>
+    <div style="margin-top:5px; padding-top:5px; border-top:1px solid #444;">
+        <div class="break-header-row">
+            <span class="break-label">PRZERWA 1:</span>
+            <button type="button" id="btnToggleB1" class="btn-toggle-break" onclick="toggleBreakPaid(1)">Bezpłatna</button>
+        </div>
         <div class="time-row"><input type="time" id="editB1S"><input type="time" id="editB1E"></div>
-        <span class="break-label">PRZERWA 2:</span>
+        
+        <div class="break-header-row">
+            <span class="break-label">PRZERWA 2:</span>
+            <button type="button" id="btnToggleB2" class="btn-toggle-break" onclick="toggleBreakPaid(2)">Bezpłatna</button>
+        </div>
         <div class="time-row"><input type="time" id="editB2S"><input type="time" id="editB2E"></div>
-        <span class="break-label">PRZERWA 3:</span>
+        
+        <div class="break-header-row">
+            <span class="break-label">PRZERWA 3:</span>
+            <button type="button" id="btnToggleB3" class="btn-toggle-break" onclick="toggleBreakPaid(3)">Bezpłatna</button>
+        </div>
         <div class="time-row"><input type="time" id="editB3S"><input type="time" id="editB3E"></div>
     </div>
 
@@ -384,9 +262,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         <button style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
     </div>
     <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%;">
-        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">
-            WERSJA: 1.0.0
-        </span>
+        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.0.7</span>
     </div>
 </div>
 
@@ -404,6 +280,7 @@ let viewDate = new Date();
 let daysData = {};
 let db = null;
 let currentEditingKey = null;
+let currentModalBreaksPaid = [false, false, false];
 
 const settingsIcon = `
 <svg class="font-sliders-icon" viewBox="0 0 24 24">
@@ -423,10 +300,7 @@ function showToast(message, type = "success") {
     toast.className = "toast-container show";
     if (type === "success") toast.classList.add("toast-success");
     if (type === "error") toast.classList.add("toast-error");
-
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3000);
+    setTimeout(() => { toast.classList.remove("show"); }, 3000);
 }
 
 function checkBackupStatus() {
@@ -441,27 +315,21 @@ function checkBackupStatus() {
         checkDate.setDate(now.getDate() - i);
         let k = getKey(checkDate);
         if (daysData[k]) {
-            totalHoursLast7Days += calculateWork(checkDate, daysData[k]);
+            totalHoursLast7Days += calculateWork(checkDate, daysData[k], k);
         }
     }
-
     if (totalHoursLast7Days <= 0) {
         exportBtn.classList.remove("needs-backup");
         exportIcon.innerHTML = "📤";
         return;
     }
-
     let triggerAlert = false;
-
     if (!lastBackup) {
         triggerAlert = true;
     } else {
         const diffDays = Math.floor((now - new Date(lastBackup)) / (1000 * 60 * 60 * 24));
-        if (diffDays >= 7) {
-            triggerAlert = true;
-        }
+        if (diffDays >= 7) triggerAlert = true;
     }
-
     if (now.getDay() === 6) {
         const todayKey = getKey(now);
         const todayData = daysData[todayKey];
@@ -469,15 +337,14 @@ function checkBackupStatus() {
             const endParts = todayData.end.split(":").map(Number);
             const workEndTime = new Date();
             workEndTime.setHours(endParts[0], endParts[1], 0, 0);
-            
+            if (todayData.start && endParts[0] < Number(todayData.start.split(":")[0])) {
+                workEndTime.setDate(workEndTime.getDate() + 1);
+            }
             if (now >= workEndTime) {
-                if (!lastBackup || new Date(lastBackup) < workEndTime) {
-                    triggerAlert = true;
-                }
+                if (!lastBackup || new Date(lastBackup) < workEndTime) triggerAlert = true;
             }
         }
     }
-
     if (triggerAlert) {
         exportBtn.classList.add("needs-backup");
         exportIcon.innerHTML = `<span class="warning-triangle">⚠️</span>`;
@@ -494,19 +361,10 @@ function initDB() {
                 if (persistent) console.log("Pamięć zabezpieczona.");
             });
         }
-
         const req = indexedDB.open("WORK_DATA_DB", 1);
-        req.onupgradeneeded = e => {
-            e.target.result.createObjectStore("days", { keyPath: "key" });
-        };
-        req.onsuccess = e => {
-            db = e.target.result;
-            resolve();
-        };
-        req.onerror = e => {
-            console.error("Błąd IndexedDB:", e);
-            resolve();
-        };
+        req.onupgradeneeded = e => { e.target.result.createObjectStore("days", { keyPath: "key" }); };
+        req.onsuccess = e => { db = e.target.result; resolve(); };
+        req.onerror = e => { resolve(); };
     });
 }
 
@@ -535,9 +393,7 @@ function loadFromDB() {
 function exportData() {
     if (!db) return showToast("Baza danych nie jest gotowa.", "error");
     const tx = db.transaction("days", "readonly");
-    const store = tx.objectStore("days");
-    const req = store.getAll();
-
+    const req = tx.objectStore("days").getAll();
     req.onsuccess = () => {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(req.result, null, 2));
         const downloadAnchor = document.createElement('a');
@@ -546,40 +402,50 @@ function exportData() {
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
-        
         localStorage.setItem("last_backup_date", new Date().toISOString());
         checkBackupStatus();
         showToast("Kopia zapasowa została pobrana!");
     };
 }
 
+function formatModalTitle(key) {
+    const parts = key.split("-").map(Number);
+    const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+    const dayName = dayNamesLong[dateObj.getDay()];
+    const dStr = String(parts[2]).padStart(2, '0');
+    const mStr = String(parts[1]).padStart(2, '0');
+    const yStr = parts[0];
+    return `${dayName} ${dStr}-${mStr}-${yStr}`;
+}
+
+function toggleBreakPaid(index) {
+    currentModalBreaksPaid[index - 1] = !currentModalBreaksPaid[index - 1];
+    const btn = document.getElementById(`btnToggleB${index}`);
+    if (currentModalBreaksPaid[index - 1]) {
+        btn.textContent = "Płatna";
+        btn.classList.add("paid");
+    } else {
+        btn.textContent = "Bezpłatna";
+        btn.classList.remove("paid");
+    }
+}
+
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const importedItems = JSON.parse(e.target.result);
             if (!Array.isArray(importedItems)) throw new Error("Nieprawidłowy format pliku.");
-
             const tx = db.transaction("days", "readwrite");
             const store = tx.objectStore("days");
-
-            importedItems.forEach(item => {
-                if (item.key) store.put(item);
-            });
-
+            importedItems.forEach(item => { if (item.key) store.put(item); });
             tx.oncomplete = () => {
                 showToast("Dane zostały pomyślnie przywrócone!");
-                loadFromDB().then(() => {
-                    render();
-                    checkBackupStatus();
-                });
+                loadFromDB().then(() => { render(); checkBackupStatus(); });
             };
-        } catch (err) {
-            showToast("Błąd importu pliku.", "error");
-        }
+        } catch (err) { showToast("Błąd importu pliku.", "error"); }
     };
     reader.readAsText(file);
     event.target.value = "";
@@ -588,40 +454,51 @@ function importData(event) {
 function triggerSettingsWithAnimation(tdElement, key) {
     const svgIcon = tdElement.querySelector('.font-sliders-icon');
     if (!svgIcon) return;
-
     svgIcon.classList.add('animating');
-
     setTimeout(() => {
         svgIcon.classList.remove('animating');
-        
-        setTimeout(() => {
-            openEdit(key);
-        }, 180);
-
+        setTimeout(() => { openEdit(key); }, 180);
     }, 180);
 }
 
 function openEdit(key) {
     currentEditingKey = key;
-    const data = daysData[key] || {rate: 80, work: 1, start: "00:00", end: "00:00", customBreaks: [], note: ""};
-    document.getElementById("modalTitle").textContent = "Ustaw: " + key;
+    const data = daysData[key] || {rate: 80, work: 1, start: "00:00", end: "00:00", customBreaks: [], breaksPaidFlags: [], note: ""};
+    
+    document.getElementById("modalTitle").textContent = formatModalTitle(key);
     document.getElementById("editRate").value = data.rate || 80;
     document.getElementById("workStart").value = data.start || "00:00";
     document.getElementById("workEnd").value = data.end || "00:00";
     document.getElementById("dayNote").value = data.note || "";
+    
+    currentModalBreaksPaid = [false, false, false];
+    if (data.breaksPaidFlags && Array.isArray(data.breaksPaidFlags)) {
+        for(let i=0; i<3; i++) {
+            if (data.breaksPaidFlags[i] !== undefined) {
+                currentModalBreaksPaid[i] = !!data.breaksPaidFlags[i];
+            }
+        }
+    }
+
     for(let i=1; i<=3; i++) {
         const b = (data.customBreaks && data.customBreaks[i-1]) ? data.customBreaks[i-1] : ["", ""];
-        document.getElementById(`editB${i}S`).value = b[0]; document.getElementById(`editB${i}E`).value = b[1];
+        document.getElementById(`editB${i}S`).value = b[0]; 
+        document.getElementById(`editB${i}E`).value = b[1];
+        
+        const btn = document.getElementById(`btnToggleB${i}`);
+        if (currentModalBreaksPaid[i-1]) {
+            btn.textContent = "Płatna";
+            btn.classList.add("paid");
+        } else {
+            btn.textContent = "Bezpłatna";
+            btn.classList.remove("paid");
+        }
     }
     
-    // PŁYNNE GENEROWANIE EMERGENCE
     const overlay = document.getElementById("overlay");
     const editModal = document.getElementById("editModal");
-    
     overlay.style.display = "block";
     editModal.classList.add("active-render");
-    
-    // Wymuszenie odświeżenia drzewa DOM przed nadaniem klas animacyjnych
     setTimeout(() => {
         overlay.classList.add("show");
         editModal.classList.add("show");
@@ -630,23 +507,15 @@ function openEdit(key) {
 
 function openNoteModal(key) {
     if (!daysData[key] || !daysData[key].note) return;
-    
-    // Zmiana formatu z 2026-5-20 na 20.05.2026
     const parts = key.split("-");
-    const year = parts[0];
-    const month = parts[1].padStart(2, "0");
-    const day = parts[2].padStart(2, "0");
-    const formattedDate = `${day}.${month}.${year}`;
-
+    const formattedDate = `${parts[2].padStart(2, "0")}.${parts[1].padStart(2, "0")}.${parts[0]}`;
     document.getElementById("noteModalTitle").textContent = "Notatka z dnia " + formattedDate;
     document.getElementById("noteModalContent").textContent = daysData[key].note;
     
     const overlay = document.getElementById("overlay");
     const noteModal = document.getElementById("noteModal");
-    
     overlay.style.display = "block";
     noteModal.classList.add("active-render");
-    
     setTimeout(() => {
         overlay.classList.add("show");
         noteModal.classList.add("show");
@@ -657,12 +526,9 @@ function closeAllModals() {
     const overlay = document.getElementById("overlay");
     const editModal = document.getElementById("editModal");
     const noteModal = document.getElementById("noteModal");
-    
     overlay.classList.remove("show");
     editModal.classList.remove("show");
     noteModal.classList.remove("show");
-    
-    // Ukrycie elementów z display: none dopiero po zakończeniu animacji CSS (220ms)
     setTimeout(() => {
         if (!editModal.classList.contains("show")) editModal.classList.remove("active-render");
         if (!noteModal.classList.contains("show")) noteModal.classList.remove("active-render");
@@ -678,13 +544,14 @@ function saveDay() {
     daysData[key].end = document.getElementById("workEnd").value;
     daysData[key].note = document.getElementById("dayNote").value;
     daysData[key].customBreaks = [];
+    daysData[key].breaksPaidFlags = [...currentModalBreaksPaid];
+    
     for(let i=1; i<=3; i++) {
         let s = document.getElementById(`editB${i}S`).value, e = document.getElementById(`editB${i}E`).value;
         if(s && e) daysData[key].customBreaks.push([s, e]);
     }
     saveToDB(key, daysData[key]);
-    closeAllModals(); render();
-    checkBackupStatus();
+    closeAllModals(); render(); checkBackupStatus();
     showToast("Zapisano ustawienia dnia.");
 }
 
@@ -701,20 +568,12 @@ function applyToBulk(mode) {
     const lastDay = new Date(y, m + 1, 0).getDate();
     let targets = [];
 
-    if(mode === 'month') { 
-        for(let d=1; d<=lastDay; d++) targets.push(new Date(y, m, d)); 
-    }
+    if(mode === 'month') { for(let d=1; d<=lastDay; d++) targets.push(new Date(y, m, d)); }
     else if(mode === 'saturday') {
-        for(let d=1; d<=lastDay; d++) {
-            let date = new Date(y, m, d);
-            if(date.getDay() === 6) targets.push(date);
-        }
+        for(let d=1; d<=lastDay; d++) { let date = new Date(y, m, d); if(date.getDay() === 6) targets.push(date); }
     }
     else if(mode === 'sunday') {
-        for(let d=1; d<=lastDay; d++) {
-            let date = new Date(y, m, d);
-            if(date.getDay() === 0) targets.push(date);
-        }
+        for(let d=1; d<=lastDay; d++) { let date = new Date(y, m, d); if(date.getDay() === 0) targets.push(date); }
     }
     else {
         const baseDate = new Date(currentEditingKey);
@@ -731,34 +590,52 @@ function applyToBulk(mode) {
         let k = getKey(date);
         if(!daysData[k]) daysData[k] = {work: 1}; 
         daysData[k].rate = rate; daysData[k].start = start; daysData[k].end = end; daysData[k].customBreaks = breaks;
+        daysData[k].breaksPaidFlags = [...currentModalBreaksPaid];
         saveToDB(k, daysData[k]);
     });
-    closeAllModals(); render();
-    checkBackupStatus();
+    closeAllModals(); render(); checkBackupStatus();
     showToast("Zastosowano zmiany masowe.");
 }
 
-function calculateWork(date, dayObj) {
+function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
     if (!dayObj || dayObj.work === 0) return 0;
     let sTime = dayObj.start || "00:00", eTime = dayObj.end || "00:00";
     if (sTime === eTime) return 0;
-    let now = new Date();
-    let start = new Date(date); start.setHours(...sTime.split(":").map(Number),0,0);
-    let end = new Date(date); end.setHours(...eTime.split(":").map(Number),0,0);
-    let finish;
-    if (date.toDateString() === now.toDateString()) {
-        if (now < start) return 0;
-        finish = now > end ? end : now;
-    } else { finish = date > now ? null : end; }
-    if (!finish || finish <= start) return 0;
+    
+    let startParts = sTime.split(":").map(Number);
+    let endParts = eTime.split(":").map(Number);
+    let parts = dayKeyStr.split("-").map(Number);
+    let start = new Date(parts[0], parts[1] - 1, parts[2], startParts[0], startParts[1], 0, 0);
+    let end = new Date(parts[0], parts[1] - 1, parts[2], endParts[0], endParts[1], 0, 0);
+    
+    if (end <= start) end.setDate(end.getDate() + 1);
+    if (currentTimeObj < start) return 0;
+    
+    let finish = currentTimeObj > end ? end : currentTimeObj;
     let totalMs = finish - start;
-    (dayObj.customBreaks || []).forEach(b => {
-        let bs = new Date(date); bs.setHours(...b[0].split(":").map(Number),0,0);
-        let be = new Date(date); be.setHours(...b[1].split(":").map(Number),0,0);
+    
+    (dayObj.customBreaks || []).forEach((b, idx) => {
+        if (dayObj.breaksPaidFlags && dayObj.breaksPaidFlags[idx] === true) return;
+        let bStartParts = b[0].split(":").map(Number);
+        let bEndParts = b[1].split(":").map(Number);
+        let bs = new Date(parts[0], parts[1] - 1, parts[2], bStartParts[0], bStartParts[1], 0, 0);
+        let be = new Date(parts[0], parts[1] - 1, parts[2], bEndParts[0], bEndParts[1], 0, 0);
+        
+        if (bStartParts[0] < startParts[0]) bs.setDate(bs.getDate() + 1);
+        if (bEndParts[0] < startParts[0] || be <= bs) be.setDate(be.getDate() + 1);
+        
         let overlap = Math.min(finish, be) - Math.max(start, bs);
         if (overlap > 0) totalMs -= overlap;
     });
+    
     return Math.max(0, totalMs / 3600000);
+}
+
+function formatHoursToHM(hoursDec) {
+    let totalSeconds = Math.round(hoursDec * 3600);
+    let h = Math.floor(totalSeconds / 3600);
+    let m = Math.floor((totalSeconds % 3600) / 60);
+    return `${h}:${m.toString().padStart(2, '0')}`;
 }
 
 function render() {
@@ -767,24 +644,44 @@ function render() {
     let m = viewDate.getMonth(), y = viewDate.getFullYear();
     document.getElementById("monthTitle").textContent = monthNames[m] + " " + y;
     let lastDay = new Date(y, m+1, 0).getDate();
-    let totH = 0, totM = 0, wH = 0, wM = 0;
-    let todayKey = getKey(new Date());
+    
+    staticTotalHours = 0;
+    staticTotalMoney = 0;
+    let nowObj = new Date();
+    let todayKey = getKey(nowObj);
+    let yesterdayObj = new Date(nowObj); yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+    let yesterdayKey = getKey(yesterdayObj);
     
     let notesCount = 0;
+    let currentWeekH = 0;
+    let currentWeekM = 0;
+    let containsTodayInWeek = false;
 
     for(let d=1; d<=lastDay; d++) {
         let date = new Date(y, m, d), dw = date.getDay(), key = getKey(date);
-        if(!daysData[key]) daysData[key] = {rate:80, work:1, start:"00:00", end:"00:00", customBreaks:[], note:""};
-        let h = calculateWork(date, daysData[key]), mv = h * (daysData[key].rate || 80);
-        totH += h; totM += mv; wH += h; wM += mv;
+        if(!daysData[key]) daysData[key] = {rate:80, work:1, start:"00:00", end:"00:00", customBreaks:[], breaksPaidFlags:[], note:""};
+        
+        let isToday = (key === todayKey);
+        let isYesterday = (key === yesterdayKey);
+        let h = 0; let mv = 0;
+        
+        let isLiveManaged = isToday || (isYesterday && daysData[key].end && daysData[key].start && Number(daysData[key].end.split(":")[0]) <= Number(daysData[key].start.split(":")[0]));
+        
+        if (!isLiveManaged) {
+            let targetEvalTime = new Date(y, m, d, 23, 59, 59);
+            if (daysData[key].end && daysData[key].start && Number(daysData[key].end.split(":")[0]) <= Number(daysData[key].start.split(":")[0])) {
+                targetEvalTime.setDate(targetEvalTime.getDate() + 1);
+            }
+            h = calculateWork(targetEvalTime, daysData[key], key);
+            mv = h * (daysData[key].rate || 80);
+            staticTotalHours += h;
+            staticTotalMoney += mv;
+        }
+
         let tr = document.createElement("tr");
         if(dw === 6) tr.className = "saturday";
         if(dw === 0) tr.className = "sunday";
-        
-        if(key === todayKey) {
-            tr.classList.add("today");
-            tr.id = "today-row";
-        }
+        if(isToday) { tr.classList.add("today"); tr.id = "today-row"; containsTodayInWeek = true; }
         if(daysData[key].work === 0) tr.className += " dayOff";
         
         let neonBubbleElement = `<div style="width:20px; height:17px; flex-shrink:0;"></div>`;
@@ -801,7 +698,6 @@ function render() {
         }
 
         const dayNameStr = date.toLocaleDateString('pl-PL',{weekday:'short'});
-        
         tr.innerHTML = `
             <td colspan="2">
                 <div class="date-row-container">
@@ -810,51 +706,101 @@ function render() {
                     <span class="date-day-name">${dayNameStr}</span>
                 </div>
             </td>
-            <td>${h.toFixed(2)}</td>
-            <td>${mv.toFixed(0)}</td>
+            <td ${isLiveManaged ? `id="live-managed-hours-${key}" data-key="${key}"` : ''}>${isLiveManaged ? '0:00' : formatHoursToHM(h)}</td>
+            <td ${isLiveManaged ? `id="live-managed-money-${key}"` : ''}>${isLiveManaged ? '0.00' : mv.toFixed(2)}</td>
             <td onclick="triggerSettingsWithAnimation(this, '${key}')">${settingsIcon}</td>
         `;
         
         tr.onclick = (e) => { 
             if(e.target.closest('.font-sliders-icon') || e.target.closest('td').cellIndex === 4) return; 
-            
-            if(e.target.classList.contains('neon-bubble-svg') || e.target.closest('.neon-bubble-svg')) {
-                openNoteModal(key);
-                return;
-            }
-
+            if(e.target.classList.contains('neon-bubble-svg') || e.target.closest('.neon-bubble-svg')) { openNoteModal(key); return; }
             daysData[key].work = daysData[key].work ? 0 : 1; 
-            saveToDB(key, daysData[key]); 
-            render(); 
-            checkBackupStatus();
+            saveToDB(key, daysData[key]); render(); checkBackupStatus();
         };
         tbody.appendChild(tr);
+
+        if (!isLiveManaged) { currentWeekH += h; currentWeekM += mv; }
+
         if(dw === 0 || d === lastDay) {
-            tbody.insertAdjacentHTML('beforeend', `<tr class="weekSummary"><td colspan="2">TYDZIEŃ</td><td>${wH.toFixed(2)}</td><td colspan="2">${wM.toFixed(0)} zł</td></tr>`);
-            wH = 0; wM = 0;
+            let weekTr = document.createElement("tr"); weekTr.className = "weekSummary";
+            if (containsTodayInWeek) {
+                weekTr.classList.add("live-week-row");
+                weekTr.innerHTML = `<td colspan="2">TYDZIEŃ</td><td class="live-week-hours-target" data-base="${currentWeekH}">0:00</td><td colspan="2" class="live-week-money-target" data-base="${currentWeekM}">0.00</td>`;
+                containsTodayInWeek = false;
+            } else {
+                weekTr.innerHTML = `<td colspan="2">TYDZIEŃ</td><td>${formatHoursToHM(currentWeekH)}</td><td colspan="2">${currentWeekM.toFixed(2)}</td>`;
+            }
+            tbody.appendChild(weekTr);
+            currentWeekH = 0; currentWeekM = 0;
         }
     }
     
     const globalWrapper = document.getElementById("globalMonthBubbleWrapper");
     const globalCountText = document.getElementById("globalBubbleCount");
-    
-    if (notesCount > 0) {
-        globalCountText.textContent = notesCount;
-        globalWrapper.style.display = "flex";
-    } else {
-        globalWrapper.style.display = "none";
-    }
+    if (notesCount > 0) { globalCountText.textContent = notesCount; globalWrapper.style.display = "flex"; } else { globalWrapper.style.display = "none"; }
+    triggerLiveUpdate();
+}
 
-    document.getElementById("totalHours").textContent = totH.toFixed(2);
-    document.getElementById("totalMoney").textContent = totM.toFixed(0) + " zł";
+function triggerLiveUpdate() {
+    let now = new Date();
+    let todayKey = getKey(now);
+    let yesterdayObj = new Date(now); yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+    let yesterdayKey = getKey(yesterdayObj);
+
+    let keysToUpdate = [todayKey, yesterdayKey];
+    let temporaryLiveHoursSum = 0;
+    let temporaryLiveMoneySum = 0;
+
+    keysToUpdate.forEach(k => {
+        let dObj = daysData[k];
+        let liveHours = 0; let liveMoney = 0;
+        if(dObj && dObj.work !== 0 && dObj.start !== dObj.end) {
+            liveHours = calculateWork(now, dObj, k);
+            liveMoney = liveHours * (dObj.rate || 80);
+        }
+        let hCell = document.getElementById(`live-managed-hours-${k}`);
+        let mCell = document.getElementById(`live-managed-money-${k}`);
+        if (hCell) hCell.textContent = formatHoursToHM(liveHours);
+        if (mCell) mCell.textContent = liveMoney.toFixed(2);
+        temporaryLiveHoursSum += liveHours;
+        temporaryLiveMoneySum += liveMoney;
+    });
+
+    let liveWeekRows = document.querySelectorAll(".live-week-row");
+    liveWeekRows.forEach(row => {
+        let hTarget = row.querySelector(".live-week-hours-target");
+        let mTarget = row.querySelector(".live-week-money-target");
+        if(hTarget && mTarget) {
+            let baseH = parseFloat(hTarget.dataset.base || 0);
+            let baseM = parseFloat(mTarget.dataset.base || 0);
+            let currentWeekSumH = baseH; let currentWeekSumM = baseM;
+            let sibling = row.previousElementSibling;
+            while(sibling && !sibling.classList.contains("weekSummary")) {
+                let todayHCell1 = sibling.querySelector(`[id="live-managed-hours-${todayKey}"]`);
+                let yesterdayHCell1 = sibling.querySelector(`[id="live-managed-hours-${yesterdayKey}"]`);
+                if(todayHCell1) { let tObj = daysData[todayKey]; if(tObj) currentWeekSumH += calculateWork(now, tObj, todayKey); }
+                if(yesterdayHCell1) { let yObj = daysData[yesterdayKey]; if(yObj) currentWeekSumH += calculateWork(now, yObj, yesterdayKey); }
+                let todayMCell1 = sibling.querySelector(`[id="live-managed-money-${todayKey}"]`);
+                let yesterdayMCell1 = sibling.querySelector(`[id="live-managed-money-${yesterdayKey}"]`);
+                if(todayMCell1) { let tObj = daysData[todayKey]; if(tObj) currentWeekSumM += (calculateWork(now, tObj, todayKey) * (tObj.rate || 80)); }
+                if(yesterdayMCell1) { let yObj = daysData[yesterdayKey]; if(yObj) currentWeekSumM += (calculateWork(now, yObj, yesterdayKey) * (yObj.rate || 80)); }
+                sibling = sibling.previousElementSibling;
+            }
+            hTarget.textContent = formatHoursToHM(currentWeekSumH);
+            mTarget.textContent = currentWeekSumM.toFixed(2);
+        }
+    });
+
+    if (viewDate.getMonth() === now.getMonth() && viewDate.getFullYear() === now.getFullYear()) {
+        document.getElementById("totalHours").textContent = formatHoursToHM(staticTotalHours + temporaryLiveHoursSum);
+        document.getElementById("totalMoney").textContent = (staticTotalMoney + temporaryLiveMoneySum).toFixed(2);
+    }
 }
 
 function scrollToToday() {
     setTimeout(() => {
         const todayRow = document.getElementById("today-row");
-        if (todayRow) {
-            todayRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        if (todayRow) todayRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 300);
 }
 
@@ -868,7 +814,6 @@ function changeMonth(step) { viewDate.setMonth(viewDate.getMonth() + step); rend
 
 function updateWeather() {
     const weatherInfo = document.getElementById('weather-info');
-
     const getForecast = (lat, lon, cityName = "") => {
         if (!cityName) {
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
@@ -878,11 +823,8 @@ function updateWeather() {
                     fetchWeather(lat, lon, city);
                 })
                 .catch(() => fetchWeather(lat, lon, "Twoja pozycja"));
-        } else {
-            fetchWeather(lat, lon, cityName);
-        }
+        } else { fetchWeather(lat, lon, cityName); }
     };
-
     const fetchWeather = (lat, lon, city) => {
         fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m`)
             .then(res => res.json())
@@ -891,12 +833,10 @@ function updateWeather() {
                 const wind = Math.round(weather.current_weather.windspeed);
                 const hourIndex = new Date().getHours();
                 const hum = weather.hourly.relativehumidity_2m[hourIndex];
-                
                 weatherInfo.innerHTML = `📍 ${city} | 🌡️ ${temp}°C | 💧 ${hum}% | 💨 ${wind} km/h`;
             })
             .catch(() => { weatherInfo.innerText = "Błąd pogody"; });
     };
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (pos) => getForecast(pos.coords.latitude, pos.coords.longitude),
@@ -914,21 +854,41 @@ setInterval(() => {
     let now = new Date();
     document.getElementById("clock").textContent = now.toLocaleTimeString("pl-PL");
     document.getElementById("dayLabel").textContent = dayNamesLong[now.getDay()];
-    let key = getKey(now);
-    let dObj = daysData[key];
-    let breakInfo = "";
     
-    if(now.getSeconds() === 0) {
-        checkBackupStatus();
+    let activeKey = getKey(now);
+    let dObj = daysData[activeKey];
+    let yesterdayObj = new Date(now); yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+    let yesterdayKey = getKey(yesterdayObj);
+    let yObj = daysData[yesterdayKey];
+    
+    if (yObj && yObj.work !== 0 && yObj.start && yObj.end) {
+        let yStartParts = yObj.start.split(":").map(Number);
+        let yEndParts = yObj.end.split(":").map(Number);
+        if (yEndParts[0] <= yStartParts[0]) {
+            let yParts = yesterdayKey.split("-").map(Number);
+            let yEndFullDate = new Date(yParts[0], yParts[1] - 1, yParts[2], yEndParts[0], yEndParts[1], 0, 0);
+            yEndFullDate.setDate(yEndFullDate.getDate() + 1);
+            if (now <= yEndFullDate) { activeKey = yesterdayKey; dObj = yObj; }
+        }
     }
+    
+    let breakInfo = "";
+    if(now.getSeconds() === 0) checkBackupStatus();
+    triggerLiveUpdate();
 
     if(dObj && dObj.work !== 0 && dObj.start !== dObj.end) {
-        let s = new Date(); s.setHours(...dObj.start.split(":").map(Number),0,0);
-        let e = new Date(); e.setHours(...dObj.end.split(":").map(Number),0,0);
+        let startParts = dObj.start.split(":").map(Number);
+        let endParts = dObj.end.split(":").map(Number);
+        let parts = activeKey.split("-").map(Number);
+        let s = new Date(parts[0], parts[1] - 1, parts[2], startParts[0], startParts[1], 0, 0);
+        let e = new Date(parts[0], parts[1] - 1, parts[2], endParts[0], endParts[1], 0, 0);
+        if (endParts[0] <= startParts[0]) e.setDate(e.getDate() + 1);
+
+        let liveHours = calculateWork(now, dObj, activeKey);
+        document.getElementById("todayWork").textContent = `Dziś przepracowano: ${formatHoursToHM(liveHours)} H`;
 
         if(now >= s && now <= e) {
             document.getElementById("progress-bar").style.width = ((now - s) / (e - s) * 100) + "%";
-            document.getElementById("todayWork").textContent = `Dziś: ${calculateWork(now, dObj).toFixed(2)}h`;
         } else if (now > e) {
             document.getElementById("progress-bar").style.width = "100%";
             document.getElementById("todayWork").innerHTML = '<span style="color:#ffd700;">FAJRANT! 🍻</span>';
@@ -937,11 +897,15 @@ setInterval(() => {
             document.getElementById("todayWork").innerHTML = `<span style="color:var(--blue);">Start za: ${formatTimeLeft(s - now)}</span>`;
         }
 
-        let currentBreak = null;
-        let nextBreak = null;
+        let currentBreak = null; let nextBreak = null;
         (dObj.customBreaks || []).forEach(b => {
-            let bs = new Date(); bs.setHours(...b[0].split(":").map(Number),0,0);
-            let be = new Date(); be.setHours(...b[1].split(":").map(Number),0,0);
+            let bStartParts = b[0].split(":").map(Number);
+            let bEndParts = b[1].split(":").map(Number);
+            let bs = new Date(parts[0], parts[1] - 1, parts[2], bStartParts[0], bStartParts[1], 0, 0);
+            if (bStartParts[0] < startParts[0]) bs.setDate(bs.getDate() + 1);
+            let be = new Date(parts[0], parts[1] - 1, parts[2], bEndParts[0], bEndParts[1], 0, 0);
+            if (bEndParts[0] < startParts[0] || bEndParts[0] <= bStartParts[0]) be.setDate(be.getDate() + 1);
+            
             if(now >= bs && now < be) currentBreak = be - now;
             else if (bs > now && (!nextBreak || bs < nextBreak)) nextBreak = bs;
         });
@@ -958,12 +922,28 @@ setInterval(() => {
     document.getElementById("breakTimer").innerHTML = breakInfo;
 }, 1000);
 
+/* ZAKTUALIZOWANA REJESTRACJA SERVICE WORKERA Z WYKRYWANIEM AKTUALIZACJI */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+        reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        showToast("Pobrano aktualizację! Odświeżam...", "success");
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }
+                });
+            }
+        });
+    }).catch(err => console.log("Błąd rejestracji SW:", err));
+}
+
 initDB().then(() => {
     loadFromDB().then(() => {
-        render();
-        updateWeather();
-        checkBackupStatus();
-        scrollToToday();
+        render(); updateWeather(); checkBackupStatus(); scrollToToday();
         setInterval(updateWeather, 900000);
     });
 });
