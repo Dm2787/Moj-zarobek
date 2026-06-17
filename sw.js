@@ -1,6 +1,5 @@
-const CACHE_NAME = 'czas-pracy-v16'; // Zmieniono na v16, aby wymusić aktualizację ikon w pamięci urządzenia
+const CACHE_NAME = 'czas-pracy-v17'; // Zmieniono na v17, aby zresetować pamięć po usunięciu błędu ścieżki
 const FILES_TO_CACHE = [
-  './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
