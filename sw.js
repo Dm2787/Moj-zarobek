@@ -1,9 +1,11 @@
-const CACHE_NAME = 'czas-pracy-v15'; // Zmieniłem wersję na v3, żeby zmusić przeglądarkę do odświeżenia cache
+const CACHE_NAME = 'czas-pracy-v16'; // Zmieniono na v16, aby wymusić aktualizację ikon w pamięci urządzenia
 const FILES_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './icon.png' // Dopasuj nazwę pliku, jeśli na serwerze nazywa się inaczej
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-maskable.png'
 ];
 
 self.addEventListener('install', (evt) => {
