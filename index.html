@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Czas pracy</title>
-<link rel="manifest" href="manifest.json">
+<link class="manifest" href="manifest.json">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -35,7 +35,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .toast-container.toast-success { border-color: var(--green); color: var(--green); }
 .toast-container.toast-error { border-color: var(--red); color: var(--red); }
 
-.header { margin-bottom: 10px; flex-shrink: 0; text-align: center; padding-top: 5px; }
+.header { margin-bottom: 10px; flex-shrink: 0; text-align: center; padding-top: 5px; border-radius: 8px; transition: all 0.3s ease; }
 #dayLabel { font-size: 15px; color: var(--blue); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 2px; font-weight: bold; }
 .clock { font-size: 42px; color: var(--blue); text-shadow: 0 0 15px var(--blue); line-height: 1; margin: 5px 0; }
 
@@ -49,7 +49,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .todayWork { font-size: 16px; color: var(--green); font-weight: bold; }
 .break-timer { font-size: 14px; margin-top: 4px; color: var(--orange); font-weight: bold; min-height: 18px; height: 18px; }
 
-.table-wrapper { flex: 1 1 auto; overflow-y: auto; border: 1px solid #333; border-radius: 8px; background: #111a22; margin-bottom: 10px; scroll-behavior: smooth; }
+.table-wrapper { flex: 1 1 auto; overflow-y: auto; border: 1px solid #333; border-radius: 8px; background: #111a22; margin-bottom: 10px; scroll-behavior: smooth; transition: all 0.3s ease; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th { position: sticky; top: 0; background: var(--panel); color: var(--blue); padding: 12px 5px; z-index: 2; border-bottom: 2px solid #333; text-transform: uppercase; font-size: 11px; }
 td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; vertical-align: middle; }
@@ -65,7 +65,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .dayOff { opacity: 0.3; text-decoration: line-through; }
 .weekSummary { background: rgba(0,0,0,0.4); color: var(--green); font-weight: bold; font-size: 12px; }
 
-.font-sliders-icon { width: 22px; height: 22px; cursor: pointer; display: block; margin: 0 auto; fill: none; }
+.font-sliders-icon { width: 22px; height: 22px; cursor: pointer; display: block; margin: 0 auto; fill: none; border-radius: 4px; }
 .font-sliders-icon .slider-track { stroke: #ffffff; opacity: 0.4; transition: stroke 0.2s, opacity 0.2s; }
 .font-sliders-icon .slider-dot { fill: #ffffff; transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), fill 0.18s; }
 
@@ -87,7 +87,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 .global-bubble-svg { width: 16px; height: 14px; filter: drop-shadow(0 0 3px var(--orange)); }
 .global-bubble-text { font-size: 14px; font-weight: bold; color: var(--orange); text-shadow: 0 0 5px var(--orange); }
 
-.backup-footer-row { display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0; }
+.backup-footer-row { display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0; transition: all 0.3s ease; border-radius: 8px; }
 .btn-backup { flex: 1; background: rgba(0, 234, 255, 0.03); border: 1px solid rgba(0, 234, 255, 0.3); color: #a0e6ff; font-size: 12px; font-weight: bold; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; }
 .btn-backup:active { background: rgba(0, 234, 255, 0.15); }
 .btn-backup.needs-backup { background: rgba(255, 26, 26, 0.25) !important; border: 2px solid #ff1a1a !important; color: #ffffff !important; font-weight: 900; animation: pulse-emergency 1.2s infinite ease-in-out; }
@@ -105,7 +105,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
     100% { transform: scale(1); }
 }
 
-.footer { flex-shrink: 0; background: var(--panel); padding: 15px; border-radius: 12px; border-top: 3px solid var(--green); }
+.footer { flex-shrink: 0; background: var(--panel); padding: 15px; border-radius: 12px; border-top: 3px solid var(--green); transition: all 0.3s ease; }
 .total-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; }
 .btn-nav { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid var(--blue); background: rgba(0,234,255,0.05); color: var(--blue); font-weight: bold; cursor: pointer; position: relative; z-index: 10; -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease, background 0.1s ease; }
 .btn-nav:active { background: rgba(0, 234, 255, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
@@ -122,12 +122,12 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 #noteModal.show { transform: translate(-50%, -50%) scale(1) !important; opacity: 1 !important; }
 #noteModalContent { white-space: pre-wrap; word-break: break-word; margin-bottom: 20px; line-height: 1.5; color: #fff; font-size: 14px; text-align: left; }
 
-.time-row { display: flex; gap: 10px; margin-bottom: 5px; align-items: center; }
+.time-row { display: flex; gap: 10px; margin-bottom: 5px; align-items: center; border-radius: 4px; transition: all 0.2s ease; }
 .time-row input { background: #000; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; width: 100%; text-align: center; font-size: 15px; }
-.modal-label { display: block; font-size: 11px; color: var(--blue); margin-bottom: 3px; text-transform: uppercase; }
+.modal-label { display: block; font-size: 11px; color: var(--blue); margin-bottom: 3px; text-transform: uppercase; border-radius: 4px; }
 .note-textarea { width: 100%; background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; box-sizing: border-box; font-family: Arial; font-size: 13px; resize: none; height: 50px; margin-bottom: 10px; }
 
-.rate-input-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
+.rate-input-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; border-radius: 4px; transition: all 0.2s ease; }
 .rate-input-wrapper input { width: 100%; max-width: 120px; background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; text-align: center; font-size: 15px; }
 
 .btn-night-mode { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.25s ease; border: 1px solid rgba(255, 255, 255, 0.2); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -145,6 +145,18 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 #editModal button[onclick*="'saturday'"]:active { background: rgba(0, 234, 255, 0.25) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
 #editModal button[onclick*="closeAllModals()"]:active { background: rgba(255, 255, 255, 0.25) !important; border: 1px solid #fff !important; transform: scale(0.95); filter: drop-shadow(0 0 12px #fff) brightness(1.3); }
 #editModal button[onclick*="saveDay()"]:active { background: rgba(0, 234, 255, 0.4) !important; transform: scale(0.95); filter: drop-shadow(0 0 8px var(--blue)); }
+
+/* --- STYLIZACJA SAMOUCZKA --- */
+.tour-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 300; pointer-events: auto; }
+.tour-overlay.show { display: block; }
+.tour-bubble { display: none; position: fixed; width: 290px; background: #16222f; border: 2px solid var(--orange); border-radius: 12px; padding: 15px; box-shadow: 0 0 25px rgba(255,153,0,0.5); z-index: 310; box-sizing: border-box; font-family: Arial, sans-serif; color: white; transition: top 0.3s ease, left 0.3s ease; }
+.tour-bubble.active { display: block; }
+.tour-bubble b { color: var(--orange); }
+.tour-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 11px; color: #aaa; }
+.tour-btns { display: flex; gap: 8px; }
+.tour-btns button { background: #223143; border: 1px solid #44566c; color: white; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+.tour-btns button:active { background: var(--orange); color: black; border-color: var(--orange); }
+.tour-highlight { position: relative; z-index: 305 !important; box-shadow: 0 0 15px var(--orange) !important; background: rgba(255,153,0,0.15) !important; border: 1px solid var(--orange) !important; }
 </style>
 </head>
 <body>
@@ -158,7 +170,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 </div>
 
 <div class="container">
-    <div class="header">
+    <div class="header" id="tour-step-header">
         <div id="dayLabel">--</div>
         <div class="clock" id="clock">00:00:00</div>
         
@@ -188,13 +200,13 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         </table>
     </div>
 
-    <div class="backup-footer-row">
+    <div class="backup-footer-row" id="tour-step-backup">
         <button class="btn-backup" id="exportBtn" onclick="exportData()"><span id="exportIcon" style="display:inline-block;">📤</span> <span id="exportText">EKSPORT</span></button>
         <button class="btn-backup" onclick="document.getElementById('importFile').click()">📥 IMPORT</button>
         <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
     </div>
 
-    <div class="footer">
+    <div class="footer" id="tour-step-footer">
         <div class="total-row"><span>Suma godzin:</span><span id="totalHours" style="color:var(--green);">0:00</span></div>
         <div class="total-row"><span>Zarobek:</span><span id="totalMoney" style="color:var(--green);">0.00</span></div>
         <div style="display:flex; gap:12px; margin-top:10px;">
@@ -210,42 +222,44 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 <div id="editModal">
     <h3 id="modalTitle" style="margin:0 0 15px 0; color:var(--blue); text-align:center; font-size: 16px;">Ustawienia</h3>
     
-    <div class="rate-input-wrapper">
+    <div class="rate-input-wrapper" id="tour-step-rate">
         <span class="modal-label">Stawka PLN/h:</span>
         <input type="number" id="editRate">
     </div>
     
-    <span class="modal-label" style="font-weight:bold;">Godziny Pracy:</span>
-    <div class="time-row"><input type="time" id="workStart"> <input type="time" id="workEnd"></div>
-    
-    <button type="button" id="btnNightShiftToggle" class="btn-night-mode day-shift" onclick="toggleNightShiftState()">
-        <span>☀️ Tryb: Dniówka</span>
-    </button>
+    <div id="tour-step-hours" style="border-radius: 4px; transition: all 0.2s ease;">
+        <span class="modal-label" style="font-weight:bold;">Godziny Pracy:</span>
+        <div class="time-row"><input type="time" id="workStart"> <input type="time" id="workEnd"></div>
+        
+        <button type="button" id="btnNightShiftToggle" class="btn-night-mode day-shift" onclick="toggleNightShiftState()">
+            <span>☀️ Tryb: Dniówka</span>
+        </button>
+    </div>
     
     <span class="modal-label" style="margin-top: 10px;">📝 Uwagi / Notatki do dnia:</span>
     <textarea id="dayNote" class="note-textarea" placeholder="Np. dzień wolny, święto itp."></textarea>
     
-    <div style="margin-top:5px; padding-top:5px; border-top:1px solid #444;">
+    <div style="margin-top:5px; padding-top:5px; border-top:1px solid #444;" id="tour-step-breaks">
         <div class="break-header-row">
             <span class="break-label">PRZERWA 1:</span>
-            <button type="button" id="btnToggleB1" class="btn-toggle-break" onclick="toggleBreakPaid(1)">Bezpłatna</button>
+            <button type="button" id="btnToggleB1" class="btn-toggle-break" onclick="toggleBreakPaid(1)">Bezpłatne</button>
         </div>
         <div class="time-row"><input type="time" id="editB1S"><input type="time" id="editB1E"></div>
         
         <div class="break-header-row">
             <span class="break-label">PRZERWA 2:</span>
-            <button type="button" id="btnToggleB2" class="btn-toggle-break" onclick="toggleBreakPaid(2)">Bezpłatna</button>
+            <button type="button" id="btnToggleB2" class="btn-toggle-break" onclick="toggleBreakPaid(2)">Bezpłatne</button>
         </div>
         <div class="time-row"><input type="time" id="editB2S"><input type="time" id="editB2E"></div>
         
         <div class="break-header-row">
             <span class="break-label">PRZERWA 3:</span>
-            <button type="button" id="btnToggleB3" class="btn-toggle-break" onclick="toggleBreakPaid(3)">Bezpłatna</button>
+            <button type="button" id="btnToggleB3" class="btn-toggle-break" onclick="toggleBreakPaid(3)">Bezpłatne</button>
         </div>
         <div class="time-row"><input type="time" id="editB3S"><input type="time" id="editB3E"></div>
     </div>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:15px 0 15px 0;">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:15px 0 15px 0;" id="tour-step-bulk">
         <button onclick="applyToBulk('week')" style="background:#222; color:var(--green); border:1px solid var(--green); padding:10px; border-radius:6px; font-size:11px;">KOPIUJ TYDZIEŃ</button>
         <button onclick="applyToBulk('month')" style="background:#222; color:var(--green); border:1px solid var(--green); padding:10px; border-radius:6px; font-size:11px;">KOPIUJ MIESIĄC</button>
         <button onclick="applyToBulk('saturday')" style="background:#222; color:var(--blue); border:1px solid var(--blue); padding:10px; border-radius:6px; font-size:11px;">KOPIUJ SOBOTY</button>
@@ -256,8 +270,10 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
         <button style="flex:1; padding:12px; background:none; color:white; border:1px solid #666; border-radius:8px;" onclick="closeAllModals()">Anuluj</button>
         <button style="flex:1; padding:12px; background:var(--blue); color:black; border:none; border-radius:8px; font-weight:bold;" onclick="saveDay()">Zapisz</button>
     </div>
-    <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%;">
-        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.2.5</span>
+    
+    <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <button type="button" onclick="closeAllModals(); setTimeout(startTour, 300)" style="background: rgba(0, 234, 255, 0.08); border: 1px solid rgba(0, 234, 255, 0.4); color: var(--blue); padding: 8px 20px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">❓ Samouczek</button>
+        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.2.4</span>
     </div>
 </div>
 
@@ -265,6 +281,18 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
     <h3 class="note-modal-title" id="noteModalTitle">Notatka</h3>
     <div class="note-modal-content" id="noteModalContent"></div>
     <button style="width:100%; padding:12px; background:var(--orange); color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="closeAllModals()">ZAMKNIJ</button>
+</div>
+
+<div id="tourOverlay" class="tour-overlay"></div>
+<div id="tourBubble" class="tour-bubble">
+    <div id="tourText"></div>
+    <div class="tour-footer">
+        <span id="tourCounter">1 / 5</span>
+        <div class="tour-btns">
+            <button id="tourPrevBtn" onclick="prevTourStep()">Wstecz</button>
+            <button id="tourNextBtn" onclick="nextTourStep()">Dalej</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -420,10 +448,10 @@ function toggleBreakPaid(index) {
     currentModalBreaksPaid[index - 1] = !currentModalBreaksPaid[index - 1];
     const btn = document.getElementById(`btnToggleB${index}`);
     if (currentModalBreaksPaid[index - 1]) {
-        btn.textContent = "Płatna";
+        btn.textContent = "Płatne";
         btn.classList.add("paid");
     } else {
-        btn.textContent = "Bezpłatna";
+        btn.textContent = "Bezpłatne";
         btn.classList.remove("paid");
     }
 }
@@ -507,10 +535,10 @@ function openEdit(key) {
         
         const btn = document.getElementById(`btnToggleB${i}`);
         if (currentModalBreaksPaid[i-1]) {
-            btn.textContent = "Płatna";
+            btn.textContent = "Płatne";
             btn.classList.add("paid");
         } else {
-            btn.textContent = "Bezpłatna";
+            btn.textContent = "Bezpłatne";
             btn.classList.remove("paid");
         }
     }
@@ -555,6 +583,8 @@ function closeAllModals() {
     const editModal = document.getElementById("editModal");
     const noteModal = document.getElementById("noteModal");
     
+    if (tourActive) return; 
+    
     overlay.classList.remove("show");
     editModal.classList.remove("show");
     noteModal.classList.remove("show");
@@ -582,7 +612,20 @@ function saveDay() {
         if(s && e) daysData[key].customBreaks.push([s, e]);
     }
     saveToDB(key, daysData[key]);
-    closeAllModals(); render(); checkBackupStatus();
+    
+    if (!tourActive) {
+        closeAllModals(); 
+    } else {
+        const overlay = document.getElementById("overlay");
+        const editModal = document.getElementById("editModal");
+        overlay.classList.remove("show");
+        editModal.classList.remove("show");
+        setTimeout(() => {
+            editModal.classList.remove("active-render");
+            overlay.style.display = "none";
+        }, 250);
+    }
+    render(); checkBackupStatus();
     showToast("Zapisano ustawienia dnia.");
 }
 
@@ -626,13 +669,15 @@ function applyToBulk(mode) {
         daysData[k].isNightShift = isNS;
         saveToDB(k, daysData[k]);
     });
-    closeAllModals(); render(); checkBackupStatus();
+    if (!tourActive) closeAllModals();
+    render(); checkBackupStatus();
     showToast("Zastosowano zmiany masowe.");
 }
 
 function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
     if (!dayObj || dayObj.work === 0) return 0;
-    let sTime = dayObj.start || "00:00", eTime = dayObj.end || "00:00";
+    let sTime = dayObj.start || "00:00";
+    let eTime = dayObj.end || "00:00";
     if (sTime === eTime) return 0;
     
     let startParts = sTime.split(":").map(Number);
@@ -648,7 +693,6 @@ function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
     let totalMs = finish - start;
     
     (dayObj.customBreaks || []).forEach((b, idx) => {
-        if (!b[0] || !b[1]) return; // Poprawka błędu przerw na GitHubie: pomiń jeśli pusty ciąg
         if (dayObj.breaksPaidFlags && dayObj.breaksPaidFlags[idx] === true) return;
         let bStartParts = b[0].split(":").map(Number);
         let bEndParts = b[1].split(":").map(Number);
@@ -771,6 +815,7 @@ function render() {
         `;
         
         tr.onclick = (e) => { 
+            if(tourActive) return; 
             if(e.target.closest('.font-sliders-icon') || e.target.closest('td').cellIndex === 4) return; 
             if(e.target.classList.contains('neon-bubble-svg') || e.target.closest('.neon-bubble-svg')) { openNoteModal(key); return; }
             daysData[key].work = daysData[key].work ? 0 : 1; 
@@ -797,11 +842,6 @@ function render() {
     const globalWrapper = document.getElementById("globalMonthBubbleWrapper");
     const globalCountText = document.getElementById("globalBubbleCount");
     if (notesCount > 0) { globalCountText.textContent = notesCount; globalWrapper.style.display = "flex"; } else { globalWrapper.style.display = "none"; }
-    
-    // Zawsze wrzucaj na start wartości statyczne dla bieżącego widoku miesiąca
-    document.getElementById("totalHours").textContent = formatHoursToHM(staticTotalHours);
-    document.getElementById("totalMoney").textContent = staticTotalMoney.toFixed(2);
-    
     triggerLiveUpdate();
 }
 
@@ -871,7 +911,6 @@ function triggerLiveUpdate() {
         }
     });
 
-    // Poprawka błędu podsumowań miesięcy historycznych: live-update modyfikuje stopkę tylko, gdy oglądamy AKTUALNY miesiąc
     if (viewDate.getMonth() === now.getMonth() && viewDate.getFullYear() === now.getFullYear()) {
         document.getElementById("totalHours").textContent = formatHoursToHM(staticTotalHours + temporaryLiveHoursSum);
         document.getElementById("totalMoney").textContent = (staticTotalMoney + temporaryLiveMoneySum).toFixed(2);
@@ -971,16 +1010,16 @@ setInterval(() => {
     if(now.getSeconds() === 0) checkBackupStatus();
     triggerLiveUpdate();
 
-    if(dObj && dObj.work !== 0 && dObj.start !== dObj.end) {
-        let startParts = dObj.start.split(":").map(Number);
-        let endParts = dObj.end.split(":").map(Number);
+    let sTime = (dObj && dObj.start) ? dObj.start : "00:00";
+    let eTime = (dObj && dObj.end) ? dObj.end : "00:00";
+
+    if(dObj && dObj.work !== 0 && sTime !== eTime) {
+        let startParts = sTime.split(":").map(Number);
+        let endParts = eTime.split(":").map(Number);
         let parts = activeKey.split("-").map(Number);
         let s = new Date(parts[0], parts[1] - 1, parts[2], startParts[0], startParts[1], 0, 0);
         let e = new Date(parts[0], parts[1] - 1, parts[2], endParts[0], endParts[1], 0, 0);
         if (dObj.isNightShift === true) e.setDate(e.getDate() + 1);
-
-        let liveHours = calculateWork(now, dObj, activeKey);
-        document.getElementById("todayWork").textContent = `Dziś przepracowano: ${formatHoursToHM(liveHours)} H`;
 
         if (now > e) {
             document.getElementById("progress-bar").style.width = "100%";
@@ -988,11 +1027,12 @@ setInterval(() => {
             breakInfo = ""; 
         } 
         else if (now >= s && now <= e) {
+            let liveHours = calculateWork(now, dObj, activeKey);
+            document.getElementById("todayWork").textContent = `Dziś przepracowano: ${formatHoursToHM(liveHours)} H`;
             document.getElementById("progress-bar").style.width = ((now - s) / (e - s) * 100) + "%";
             
             let currentBreak = null; let nextBreak = null;
             (dObj.customBreaks || []).forEach(b => {
-                if (!b[0] || !b[1]) return; // Pomijamy puste przerwy, żeby nie psuły odliczania na żywo
                 let bStartParts = b[0].split(":").map(Number);
                 let bEndParts = b[1].split(":").map(Number);
                 let bs = new Date(parts[0], parts[1] - 1, parts[2], bStartParts[0], bStartParts[1], 0, 0);
@@ -1000,7 +1040,7 @@ setInterval(() => {
                 
                 if (dObj.isNightShift === true) {
                     if (bStartParts[0] < startParts[0]) bs.setDate(bs.getDate() + 1);
-                    if (bEndParts[0] < startParts[0] || bEndParts[0] <= bStartParts[0]) be.setDate(be.getDate() + 1);
+                    if (bEndParts[0] < startParts[0] || be <= bs) be.setDate(be.getDate() + 1);
                 } else {
                     if (bEndParts[0] <= bStartParts[0]) be.setDate(be.getDate() + 1);
                 }
@@ -1043,10 +1083,228 @@ if ('serviceWorker' in navigator) {
     }).catch(err => console.log("Błąd rejestracji SW:", err));
 }
 
+// --- SILNIK SAMOUCZKA (INTERAKTYWNY) ---
+let tourActive = false;
+let tourCurrentStep = 0;
+
+function prepareTourBubbles() {
+    document.getElementById("globalMonthBubbleWrapper").style.display = "flex";
+    if (document.getElementById("globalBubbleCount").textContent === "0") {
+        document.getElementById("globalBubbleCount").textContent = "1";
+    }
+    if (!document.querySelector(".neon-bubble-svg")) {
+        const firstRowContainer = document.querySelector("#calendarBody .date-row-container");
+        if (firstRowContainer && firstRowContainer.children[1]) {
+            const targetPlaceholder = firstRowContainer.children[1];
+            if (targetPlaceholder.tagName.toLowerCase() === "div") {
+                const tempSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                tempSvg.setAttribute("id", "tour-dummy-bubble");
+                tempSvg.setAttribute("class", "neon-bubble-svg");
+                tempSvg.setAttribute("viewBox", "0 0 24 20");
+                tempSvg.innerHTML = `
+                    <path d="M2 5 C2 2, 4 2, 7 2 L17 2 C20 2, 22 2, 22 5 L22 13 C22 16, 20 16, 17 16 L7 16 L3 19 L3 16 C2 16, 2 15, 2 13 Z" fill="#000" stroke="var(--orange)" stroke-width="1.8" stroke-linejoin="round"/>
+                    <line x1="6" y1="6" x2="18" y2="6" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="6" y1="9.5" x2="18" y2="9.5" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="6" y1="13" x2="14" y2="13" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"/>
+                `;
+                firstRowContainer.replaceChild(tempSvg, targetPlaceholder);
+            }
+        }
+    }
+}
+
+function cleanupTourBubbles() {
+    if (document.getElementById("tour-dummy-bubble")) {
+        render();
+    }
+}
+
+const tourSteps = [
+    { 
+        target: "#tour-step-header", 
+        text: "<b>Panel Statusu:</b> Tutaj sprawdzisz aktualną godzinę, pogodę dla lokalizacji oraz postęp dzisiejszego dnia roboczego. System odlicza sekundy do przerw oraz upragnionego fajrantu na żywo!",
+        before: () => { forceCloseModal(); cleanupTourBubbles(); }
+    },
+    { 
+        target: "#tableWrapper", 
+        text: "<b>Kalendarz i dni wolne:</b> Szybkie kliknięcie w dowolny dzień na liście przełącza go automatycznie w tryb wolny (wiersz zblednie i zostanie przekreślony). Ponowne kliknięcie przywraca go do pracy.",
+        before: () => { forceCloseModal(); cleanupTourBubbles(); }
+    },
+    {
+        target: "#globalMonthBubbleWrapper",
+        text: "<b>Licznik Notatek Miesiąca:</b> Ten poręczny dymek informuje Cię o sumarycznej liczbie wszystkich notatek i adnotacji, które zostały przez Ciebie wprowadzone w aktualnie przeglądanym miesiącu.",
+        before: () => { 
+            forceCloseModal(); 
+            cleanupTourBubbles();
+            document.getElementById("globalMonthBubbleWrapper").style.display = "flex";
+            if (document.getElementById("globalBubbleCount").textContent === "0") {
+                document.getElementById("globalBubbleCount").textContent = "1";
+            }
+        }
+    },
+    {
+        target: ".neon-bubble-svg",
+        text: "<b>Szybki Podgląd Adnotacji:</b> Pomarańczowy dymek przy dniu oznacza obecność ważnej notatki. Nie musisz klikać w głębokie opcje konfiguracji – <b>kliknięcie bezpośrednio w ten dymek</b> otworzy podręczne, czyste okienko z szybkim podglądem treści!",
+        before: () => { 
+            forceCloseModal(); 
+            prepareTourBubbles();
+        }
+    },
+    { 
+        target: ".font-sliders-icon", 
+        text: "<b>Guzik Ustawień (⚙️):</b> Każdy wiersz ma swoją ikonę suwaków. Kliknięcie in w nią otwiera głębokie opcje konfiguracji dla konkretnego dnia roboczego.",
+        before: () => { forceCloseModal(); cleanupTourBubbles(); }
+    },
+    { 
+        target: "#tour-step-rate", 
+        text: "<b>Stawka Godzinowa:</b> W tym polu podajesz stawkę za godzinę pracy. Formularz pamięta Twoje ostatnie wpisy, więc nie musisz pisać tego codziennie.",
+        before: () => { forceOpenModal(); cleanupTourBubbles(); }
+    },
+    { 
+        target: "#tour-step-hours", 
+        text: "<b>Godziny i Tryb Nocny:</b> Ustaw ramy czasowe pracy. Przycisk <b>Tryb: Nocka</b> przełącza algorytm na tryb 24h+ (praca na przełomie dwóch dni roboczych), dzięki czemu czas liczy się poprawnie po północy.",
+        before: () => { forceOpenModal(); cleanupTourBubbles(); },
+        placement: "bottom"
+    },
+    { 
+        target: "#tour-step-breaks", 
+        text: "<b>Rozliczanie Przerw:</b> Możesz dodać max 3 niezależne przerwy w ciągu szychty. Klikając guzik obok nich, decydujesz, czy są to przerwy <b>Płatne</b> (wliczane do czasu pracy) czy <b>Bezpłatne</b>.",
+        before: () => { forceOpenModal(); cleanupTourBubbles(); }
+    },
+    { 
+        target: "#tour-step-bulk", 
+        text: "<b>Masowe Kopiowanie (Bulk):</b> Kliknięcie w te przyciski powiela wprowadzone wyżej ustawienia godzin i stawek na cały tydzień, miesiąc lub wszystkie soboty/niedziele. Automatyzacja pełną gębą!",
+        before: () => { forceOpenModal(); cleanupTourBubbles(); }
+    },
+    { 
+        target: "#tour-step-backup", 
+        text: "<b>Baza danych i Kopia:</b> Cała Twoja praca zapisuje się lokalnie w IndexedDB na telefonie. Jeżeli przepracujesz godziny, a nie zrobisz eksportu przez 7 dni, ten panel **zacznie migać na krwisty czerwony kolor** ⚠️.",
+        before: () => { forceCloseModal(); cleanupTourBubbles(); }
+    },
+    { 
+        target: "#tour-step-footer", 
+        text: "<b>Podsumowanie finansowe:</b> Na samym dole widzisz podliczenie wszystkich realnych zarobków i przepracowanych godzin w wybranym miesiącu w trybie live.",
+        before: () => { forceCloseModal(); cleanupTourBubbles(); }
+    }
+];
+
+function forceOpenModal() {
+    const modal = document.getElementById("editModal");
+    if (!modal.classList.contains("show")) {
+        const fakeKey = getKey(new Date());
+        openEdit(fakeKey);
+    }
+    modal.style.zIndex = "302"; 
+}
+
+function forceCloseModal() {
+    const modal = document.getElementById("editModal");
+    modal.style.zIndex = "";
+    modal.classList.remove("show");
+    modal.classList.remove("active-render");
+    document.getElementById("overlay").classList.remove("show");
+    document.getElementById("overlay").style.display = "none";
+}
+
+function startTour() {
+    tourActive = true;
+    tourCurrentStep = 0;
+    document.getElementById("tourOverlay").classList.add("show");
+    showTourStep();
+}
+
+function showTourStep() {
+    document.querySelectorAll(".tour-highlight").forEach(el => el.classList.remove("tour-highlight"));
+    
+    const step = tourSteps[tourCurrentStep];
+    if (step.before) step.before();
+    
+    const targetEl = document.querySelector(step.target);
+    const bubble = document.getElementById("tourBubble");
+    
+    document.getElementById("tourText").innerHTML = step.text;
+    document.getElementById("tourCounter").textContent = `${tourCurrentStep + 1} / ${tourSteps.length}`;
+    document.getElementById("tourPrevBtn").style.visibility = (tourCurrentStep === 0) ? "hidden" : "visible";
+    document.getElementById("tourNextBtn").textContent = (tourCurrentStep === tourSteps.length - 1) ? "Koniec" : "Dalej";
+    
+    if (targetEl) {
+        targetEl.classList.add("tour-highlight");
+        
+        // Chwilowo wymuszamy wyłączenie płynnego przewijania kontenera, aby wyeliminować lag pomiaru pozycji
+        const wrapper = document.getElementById("tableWrapper");
+        const prevScrollBehavior = wrapper.style.scrollBehavior;
+        wrapper.style.scrollBehavior = "auto";
+        
+        targetEl.scrollIntoView({ behavior: "auto", block: "center" });
+        
+        // Przywracamy domyślny styl zachowania przewijania kontenera
+        wrapper.style.scrollBehavior = prevScrollBehavior;
+        
+        setTimeout(() => {
+            const rect = targetEl.getBoundingClientRect();
+            const bubbleHeight = bubble.offsetHeight || 150; 
+            const bubbleWidth = 290;
+            
+            let placement = step.placement || "bottom";
+            let top = rect.bottom + 15; 
+            let left = (window.innerWidth / 2) - (bubbleWidth / 2);
+            
+            if (placement === "top") {
+                top = rect.top - bubbleHeight - 15;
+            }
+            
+            if (placement === "bottom" && top + bubbleHeight > window.innerHeight - 20) {
+                top = rect.top - bubbleHeight - 15;
+            } else if (placement === "top" && top < 10) {
+                top = rect.bottom + 15;
+            }
+            
+            if (left < 10) left = 10;
+            if (left + bubbleWidth > window.innerWidth - 10) left = window.innerWidth - bubbleWidth - 10;
+            if (top < 10) top = 10;
+            
+            bubble.style.top = `${top}px`;
+            bubble.style.left = `${left}px`;
+            bubble.style.transform = "none";
+            bubble.classList.add("active");
+        }, 50); // Skrócony czas, ponieważ pozycja elementu po skoku "auto" jest ustalona natychmiastowo
+    }
+}
+
+function nextTourStep() {
+    tourCurrentStep++;
+    if (tourCurrentStep >= tourSteps.length) {
+        endTour();
+    } else {
+        showTourStep();
+    }
+}
+
+function prevTourStep() {
+    if (tourCurrentStep > 0) {
+        tourCurrentStep--;
+        showTourStep();
+    }
+}
+
+function endTour() {
+    tourActive = false;
+    forceCloseModal();
+    cleanupTourBubbles();
+    document.getElementById("tourOverlay").classList.remove("show");
+    document.getElementById("tourBubble").classList.remove("active");
+    document.querySelectorAll(".tour-highlight").forEach(el => el.classList.remove("tour-highlight"));
+    localStorage.setItem("tutorial_done", "true");
+}
+
 initDB().then(() => {
     loadFromDB().then(() => {
         render(); updateWeather(); checkBackupStatus(); scrollToToday();
         setInterval(updateWeather, 900000);
+        
+        if (!localStorage.getItem("tutorial_done")) {
+            setTimeout(startTour, 1000);
+        }
     });
 });
 </script>
