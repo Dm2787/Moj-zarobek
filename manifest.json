@@ -28,21 +28,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "screenshots": [
-    {
-      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
-      "sizes": "1080x2400",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Główny widok tabeli"
-    },
-    {
-      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
-      "sizes": "1080x2400",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Okno edycji dnia"
-    }
   ]
 }
