@@ -335,37 +335,48 @@ const supabaseClient = (SUPABASE_URL.indexOf("TUTAJ_") === -1 && window.supabase
 
 // Tymczasowy identyfikator użytkownika - dopóki nie wprowadzimy pełnego logowania
 let currentUserId = "domyslny_uzytkownik_testowy"; 
+
 // ==========================================
-
-// Automatyczne sprawdzanie stanu zalogowania i resetu hasła
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
+// AUTOMATYCZNE SPRAWDZANIE SESJI I RESETU HASŁA
+// ==========================================
+const usunOknoLogowaniaJesliZalogowany = async (session) => {
     const loginModal = document.getElementById('login-modal');
-    
-    // WYKRYCIE RESETU HASŁA
-    if (event === 'PASSWORD_RECOVERY') {
-        // Aplikacja zauważa link ratunkowy i prosi o nowe hasło
-        const newPassword = prompt("Wpisz swoje nowe hasło (minimum 6 znaków):");
-        if (newPassword) {
-            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
-            if (error) {
-                alert("Błąd podczas zmiany hasła: " + error.message);
-            } else {
-                alert("Super! Hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.");
-            }
-        }
-    }
-
     if (session) {
-        // Mamy zalogowanego użytkownika
         currentUserId = session.user.id;
         if (loginModal) loginModal.style.display = 'none'; // Ukryj ekran logowania
-        
-        loadFromDB().then(() => render()); 
+        await loadFromDB();
+        render(); 
     } else {
-        // Nikt nie jest zalogowany
-        if (loginModal) loginModal.style.display = 'flex';
+        if (loginModal) loginModal.style.display = 'flex'; // Pokaż ekran logowania
     }
-});
+};
+
+if (supabaseClient) {
+    // 1. WYMUSZENIE SPRAWDZENIA SESJI NATYCHMIAST PRZY STARCIE STRONY
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        usunOknoLogowaniaJesliZalogowany(session);
+    });
+
+    // 2. NASŁUCHIWANIE NA ZMIANY (LOGOWANIE, WYLOGOWANIE, RESET HASŁA)
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        // WYKRYCIE RESETU HASŁA
+        if (event === 'PASSWORD_RECOVERY') {
+            const newPassword = prompt("Wpisz swoje nowe hasło (minimum 6 znaków):");
+            if (newPassword) {
+                const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+                if (error) {
+                    alert("Błąd podczas zmiany hasła: " + error.message);
+                } else {
+                    alert("Super! Hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.");
+                }
+            }
+        }
+        // Aktualizacja wyglądu ekranu na podstawie sesji
+        usunOknoLogowaniaJesliZalogowany(session);
+    });
+}
+// ==========================================
+
 
 let viewDate = new Date();
 let daysData = {};
