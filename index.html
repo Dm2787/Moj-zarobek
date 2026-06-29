@@ -13,6 +13,8 @@
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <link rel="icon" href="./icons/icon-192.png">
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root { --blue: #00eaff; --green: #00ffa6; --orange: #ff9900; --red: #ff1a1a; --bg: #0b0f14; --panel: #1a242d; }
 html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); overflow: hidden; }
@@ -294,7 +296,7 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
     
     <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;">
         <button type="button" onclick="closeAllModals(); setTimeout(startTour, 300)" style="background: rgba(0, 234, 255, 0.08); border: 1px solid rgba(0, 234, 255, 0.4); color: var(--blue); padding: 8px 20px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">❓ Samouczek</button>
-        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.2.4</span>
+        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.3.0</span>
     </div>
 </div>
 
@@ -319,6 +321,51 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 <script>
 const monthNames = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
 const dayNamesLong = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
+
+// ==========================================
+//    KONFIGURACJA CHMURY SUPABASE (BEZ LOGOWANIA)
+// ==========================================
+const SUPABASE_URL = "https://rvyaelsrlvzapalucimp.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2eWFlbHNybHZ6YXBhbHVjaW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NDQ5ODcsImV4cCI6MjA5ODEyMDk4N30.4-dFa9zpsCFVG6bBoy9ttYUlbSePQ9lt1wJD6dR6750";
+
+// Inicjalizacja klienta chmury (zabezpieczona przed brakiem wpisanych danych)
+const supabaseClient = (SUPABASE_URL.indexOf("TUTAJ_") === -1 && window.supabase) 
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
+    : null;
+
+// Tymczasowy identyfikator użytkownika - dopóki nie wprowadzimy pełnego logowania
+let currentUserId = "domyslny_uzytkownik_testowy"; 
+// ==========================================
+
+// Automatyczne sprawdzanie stanu zalogowania i resetu hasła
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    const loginModal = document.getElementById('login-modal');
+    
+    // WYKRYCIE RESETU HASŁA
+    if (event === 'PASSWORD_RECOVERY') {
+        // Aplikacja zauważa link ratunkowy i prosi o nowe hasło
+        const newPassword = prompt("Wpisz swoje nowe hasło (minimum 6 znaków):");
+        if (newPassword) {
+            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+            if (error) {
+                alert("Błąd podczas zmiany hasła: " + error.message);
+            } else {
+                alert("Super! Hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.");
+            }
+        }
+    }
+
+    if (session) {
+        // Mamy zalogowanego użytkownika
+        currentUserId = session.user.id;
+        if (loginModal) loginModal.style.display = 'none'; // Ukryj ekran logowania
+        
+        loadFromDB().then(() => render()); 
+    } else {
+        // Nikt nie jest zalogowany
+        if (loginModal) loginModal.style.display = 'flex';
+    }
+});
 
 let viewDate = new Date();
 let daysData = {};
@@ -415,22 +462,88 @@ function initDB() {
     });
 }
 
-function saveToDB(key, data) {
-    if (!db) return;
+// ASYNCHRONICZNY ZAPIS Z GWARANTOWANYM WYNIKIEM KOMUNIKACJI SIECIOWEJ
+async function saveToDB(key, data) {
+    if (!db) return false;
+    
+    // 1. Zapis lokalny do IndexedDB (Zawsze realizowany bez opóźnień)
     const tx = db.transaction("days", "readwrite");
     tx.objectStore("days").put({ key: key, ...data });
+
+    // 2. Próba zapisu do chmury Supabase
+    if (supabaseClient && currentUserId) {
+        try {
+            const { error } = await supabaseClient
+  .from('czas_pracy')
+  .upsert({
+    user_id: currentUserId,
+    day_key: key,
+    rate: data.rate,
+    start_time: data.start,
+    end_time: data.end,
+    note: data.note,
+    is_night_shift: !!data.isNightShift,
+    custom_breaks: data.customBreaks || [],
+    breaks_paid: data.breaksPaidFlags || [],
+    work: data.work !== undefined ? data.work : 1
+  }, { onConflict: 'user_id,day_key' });
+                
+            if (error) throw error;
+            return true; // Sukces - chmura zatwierdziła transakcję
+        } catch (err) {
+            console.warn("Chmura niedostępna lub błąd zapisu. Dane bezpieczne w pamięci telefonu.", err);
+            return false; // Błąd sieci lub serwera
+        }
+    }
+    return false; // Brak aktywnej konfiguracji Supabase
 }
 
-function loadFromDB() {
+// ASYNCHRONICZNE ŁADOWANIE DANYCH Z INTEGRACJĄ CHMURY
+async function loadFromDB() {
     return new Promise((resolve) => {
         if (!db) return resolve();
+        
+        // 1. Wyciągnięcie danych lokalnych dla natychmiastowego startu UI
         const req = db.transaction("days", "readonly").objectStore("days").getAll();
-        req.onsuccess = () => {
+        req.onsuccess = async () => {
             daysData = {};
             req.result.forEach(item => {
                 const { key, ...rest } = item;
                 daysData[key] = rest;
             });
+            
+            // 2. Jeśli chmura jest skonfigurowana, dociągamy najnowsze wpisy
+            if (supabaseClient && currentUserId) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('czas_pracy')
+                        .select('*')
+                        .eq('user_id', currentUserId);
+                        
+                    if (error) throw error;
+                        
+                    if (data && data.length > 0) {
+                        data.forEach(item => {
+                            daysData[item.day_key] = {
+                                rate: item.rate,
+                                start: item.start_time,
+                                end: item.end_time,
+                                note: item.note,
+                                isNightShift: item.is_night_shift,
+                                customBreaks: item.custom_breaks,
+                                breaksPaidFlags: item.breaks_paid,
+                                work: item.work !== undefined ? item.work : 1
+                            };
+                            
+                            // Aktualizujemy lokalny cache w telefonie
+                            const localTx = db.transaction("days", "readwrite");
+                            localTx.objectStore("days").put({ key: item.day_key, ...daysData[item.day_key] });
+                        });
+                    }
+                } catch (err) {
+                    console.log("Uruchomiono w trybie offline (brak chmury).");
+                }
+            }
             resolve();
         };
         req.onerror = () => resolve();
@@ -618,7 +731,8 @@ function closeAllModals() {
     }, 250);
 }
 
-function saveDay() {
+// PRAWDZIWA UCZCIWA LOGIKA TOASTÓW PO ZAPISIE DNIA
+async function saveDay() {
     const key = currentEditingKey;
     if(!daysData[key]) daysData[key] = {work:1};
     daysData[key].rate = Number(document.getElementById("editRate").value);
@@ -633,7 +747,6 @@ function saveDay() {
         let s = document.getElementById(`editB${i}S`).value, e = document.getElementById(`editB${i}E`).value;
         if(s && e) daysData[key].customBreaks.push([s, e]);
     }
-    saveToDB(key, daysData[key]);
     
     if (!tourActive) {
         closeAllModals(); 
@@ -647,11 +760,20 @@ function saveDay() {
             overlay.style.display = "none";
         }, 250);
     }
+    
     render(); checkBackupStatus();
-    showToast("Zapisano ustawienia dnia.");
+    
+    // Weryfikacja czy serwer zaakceptował paczkę danych
+    const isCloudSaved = await saveToDB(key, daysData[key]);
+    if (isCloudSaved) {
+        showToast("Zapisano ustawienia dnia w chmurze.");
+    } else {
+        showToast("Zapisano tylko lokalnie. Brak synchronizacji!", "error");
+    }
 }
 
-function applyToBulk(mode) {
+// PRAWDZIWA UCZCIWA LOGIKA DLA ZMIAN MASOWYCH
+async function applyToBulk(mode) {
     const rate = Number(document.getElementById("editRate").value);
     const start = document.getElementById("workStart").value;
     const end = document.getElementById("workEnd").value;
@@ -683,17 +805,26 @@ function applyToBulk(mode) {
         }
     }
 
+    if (!tourActive) closeAllModals();
+
+    const savePromises = [];
     targets.forEach(date => {
         let k = getKey(date);
         if(!daysData[k]) daysData[k] = {work: 1}; 
         daysData[k].rate = rate; daysData[k].start = start; daysData[k].end = end; daysData[k].customBreaks = breaks;
         daysData[k].breaksPaidFlags = [...currentModalBreaksPaid];
         daysData[k].isNightShift = isNS;
-        saveToDB(k, daysData[k]);
+        savePromises.push(saveToDB(k, daysData[k]));
     });
-    if (!tourActive) closeAllModals();
+    
     render(); checkBackupStatus();
-    showToast("Zastosowano zmiany masowe.");
+    
+    const results = await Promise.all(savePromises);
+    if (results.every(res => res === true)) {
+        showToast("Zastosowano masowe zmiany w chmurze.");
+    } else {
+        showToast("Zapisano lokalnie. Część zmian nie trafiła do chmury!", "error");
+    }
 }
 
 function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
@@ -836,13 +967,20 @@ function render() {
             <td onclick="triggerSettingsWithAnimation(event, this, '${key}')">${settingsIcon}</td>
         `;
         
-        tr.onclick = (e) => { 
+        // Asynchroniczne przełączanie stanu dnia z wiersza
+        tr.onclick = async (e) => { 
             if(tourActive) return; 
             const clickedTd = e.target.closest('td');
             if(e.target.closest('.font-sliders-icon') || (clickedTd && clickedTd.cellIndex === 3)) return; 
             if(e.target.classList.contains('neon-bubble-svg') || e.target.closest('.neon-bubble-svg')) { openNoteModal(key); return; }
+            
             daysData[key].work = daysData[key].work ? 0 : 1; 
-            saveToDB(key, daysData[key]); render(); checkBackupStatus();
+            render(); checkBackupStatus();
+            
+            const isCloudSaved = await saveToDB(key, daysData[key]);
+            if (!isCloudSaved && supabaseClient) {
+                showToast("Zapisano lokalnie. Brak synchronizacji!", "error");
+            }
         };
         tbody.appendChild(tr);
 
@@ -1341,7 +1479,174 @@ initDB().then(() => {
         }
     });
 });
+
+// --- LOGIKA EKRANU LOGOWANIA ---
+setTimeout(() => {
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const authPasswordInput = document.getElementById('auth-password');
+    const authEmailInput = document.getElementById('auth-email');
+    const btnLogin = document.getElementById('btn-login');
+    const btnRegister = document.getElementById('btn-register');
+    const authMessage = document.getElementById('auth-message');
+    const loginModal = document.getElementById('login-modal');
+    
+    // Pobranie nowych elementów
+    const btnForgot = document.getElementById('auth-forgot');
+    const rememberCheckbox = document.getElementById('auth-remember');
+
+    // Wczytywanie zapisanego maila (Zapamiętaj mnie)
+    if (localStorage.getItem('saved_email') && authEmailInput) {
+        authEmailInput.value = localStorage.getItem('saved_email');
+    }
+
+    // 1. Opcja Pokaż/Ukryj hasło
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (authPasswordInput.type === 'password') {
+                authPasswordInput.type = 'text';
+                togglePasswordBtn.textContent = 'Ukryj';
+            } else {
+                authPasswordInput.type = 'password';
+                togglePasswordBtn.textContent = 'Pokaż';
+            }
+        });
+    }
+
+    // 2. Rejestracja nowego użytkownika
+    if (btnRegister) {
+        btnRegister.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            
+            if (!email || !password) {
+                authMessage.style.color = '#ff4444';
+                authMessage.textContent = 'Wpisz e-mail i hasło!';
+                return;
+            }
+            
+            btnRegister.textContent = 'Rejestracja...';
+            
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                authMessage.style.color = '#ff4444';
+                authMessage.textContent = 'Błąd: ' + error.message;
+                btnRegister.textContent = 'UTWÓRZ KONTO';
+            } else {
+                authMessage.style.color = '#00e5ff';
+                authMessage.textContent = 'Konto utworzone! Możesz się zalogować.';
+                btnRegister.textContent = 'UTWÓRZ KONTO';
+            }
+        });
+    }
+
+    // 3. Logowanie
+    if (btnLogin) {
+        btnLogin.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            
+            if (!email || !password) {
+                authMessage.style.color = '#ff4444';
+                authMessage.textContent = 'Wpisz e-mail i hasło!';
+                return;
+            }
+            
+            btnLogin.textContent = 'Logowanie...';
+            
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                authMessage.style.color = '#ff4444';
+                authMessage.textContent = 'Błąd logowania. Złe hasło?';
+                btnLogin.textContent = 'ZALOGUJ SIĘ';
+            } else {
+                authMessage.style.color = '#00e5ff';
+                authMessage.textContent = 'Zalogowano pomyślnie!';
+                
+                // Zapisywanie maila, jeśli checkbox jest zaznaczony
+                if (rememberCheckbox && rememberCheckbox.checked) {
+                    localStorage.setItem('saved_email', email);
+                } else {
+                    localStorage.removeItem('saved_email');
+                }
+                
+                setTimeout(() => {
+                    loginModal.style.display = 'none';
+                }, 1000);
+            }
+        });
+    }
+
+    // 4. Zapomniałeś hasła
+    if (btnForgot) {
+        btnForgot.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = authEmailInput.value;
+            
+            // Sprawdzamy, czy pole e-mail nie jest puste
+            if (!email) {
+                authMessage.style.color = '#ff4444';
+                authMessage.textContent = 'Najpierw wpisz swój e-mail w polu wyżej!';
+                return;
+            }
+            
+            authMessage.style.color = '#00e5ff';
+            authMessage.textContent = 'Wysyłanie linku...';
+            
+            // Wysłanie prośby o reset do Supabase
+            const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email);
+            
+            if (error) {
+                authMessage.style.color = '#ff4444';
+                authMessage.textContent = 'Błąd: ' + error.message;
+            } else {
+                authMessage.style.color = '#00e5ff';
+                authMessage.textContent = 'Link wysłany! Sprawdź pocztę (również folder SPAM).';
+            }
+        });
+    }
+
+}, 300);
+
 </script>
+
+<div id="login-modal" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #11151a; z-index: 9999; font-family: sans-serif;">
+    
+    <img id="login-logo" src="ikona.png" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 15px; border-radius: 20px;">
+    
+    <h2 style="color: #00e5ff; margin-bottom: 30px; font-size: 28px; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); margin-top: 0;">Czas pracy</h2>
+    
+    <input type="email" id="auth-email" placeholder="Twój e-mail" style="width: 80%; max-width: 300px; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #00e5ff; background: #1a2228; color: white; font-size: 16px; outline: none; box-sizing: border-box;">
+    
+    <div style="width: 80%; max-width: 300px; position: relative; margin-bottom: 15px;">
+        <input type="password" id="auth-password" placeholder="Hasło" style="width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #00e5ff; background: #1a2228; color: white; font-size: 16px; outline: none; box-sizing: border-box; padding-right: 60px;">
+        <button id="toggle-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #00e5ff; font-size: 14px; cursor: pointer; padding: 5px;">Pokaż</button>
+    </div>
+    
+    <div style="width: 80%; max-width: 300px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 14px;">
+        <label style="color: #ccc; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="auth-remember" checked style="accent-color: #00e5ff; width: 16px; height: 16px;"> Zapamiętaj mnie
+        </label>
+        <a href="#" id="auth-forgot" style="color: #00e5ff; text-decoration: none;">Zapomniałeś hasła?</a>
+    </div>
+    
+    <button id="btn-login" style="width: 80%; max-width: 300px; padding: 15px; background: #00e5ff; color: #000; font-weight: bold; border: none; border-radius: 8px; margin-bottom: 15px; font-size: 16px; cursor: pointer; transition: opacity 0.2s;">ZALOGUJ SIĘ</button>
+    
+    <button id="btn-register" style="width: 80%; max-width: 300px; padding: 15px; background: transparent; color: #00e5ff; border: 1px solid #00e5ff; border-radius: 8px; font-size: 16px; cursor: pointer;">UTWÓRZ KONTO</button>
+    
+    <p id="auth-message" style="color: #ff4444; margin-top: 20px; font-size: 14px; text-align: center; min-height: 20px; padding: 0 20px;"></p>
+</div>
+
 
 </body>
 </html>
