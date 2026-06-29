@@ -731,8 +731,19 @@ async function logoutUser() {
     if (error) {
         alert("Błąd wylogowania: " + error.message);
     } else {
-        // Po wylogowaniu pokazujemy ponownie ekran logowania i czyścimy zmienną usera
         currentUserId = null;
+        
+        // --- SPRZĄTANIE EKRANU LOGOWANIA PO WYLOGOWANIU ---
+        const btnLogin = document.getElementById('btn-login');
+        if (btnLogin) btnLogin.textContent = 'ZALOGUJ SIĘ';
+        
+        const authMessage = document.getElementById('auth-message');
+        if (authMessage) authMessage.textContent = '';
+        
+        const authPassword = document.getElementById('auth-password');
+        if (authPassword) authPassword.value = ''; // Czyści też pole z wpisanym starym hasłem
+        // --------------------------------------------------
+        
         document.getElementById('login-modal').style.display = 'flex';
     }
 }
