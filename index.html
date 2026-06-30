@@ -364,10 +364,13 @@ const usunOknoLogowaniaJesliZalogowany = async (session) => {
 };
 
 if (supabaseClient) {
-    // 1. WYMUSZENIE SPRAWDZENIA SESJI NATYCHMIAST PRZY STARCIE STRONY
+    // 1. WYMUSZENIE SPRAWDZENIA SESJI, ALE Z BLOKADĄ DLA RESETU HASŁA
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        usunOknoLogowaniaJesliZalogowany(session);
+        if (!window.location.href.includes('type=recovery')) {
+            usunOknoLogowaniaJesliZalogowany(session);
+        }
     });
+}
 
     // 2. NASŁUCHIWANIE NA ZMIANY (LOGOWANIE, WYLOGOWANIE, RESET HASŁA)
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
