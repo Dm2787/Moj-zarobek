@@ -384,11 +384,13 @@ if (supabaseClient) {
             }
         }
         // Aktualizacja wyglądu ekranu na podstawie sesji
+            if (event !== 'PASSWORD_RECOVERY') {
         usunOknoLogowaniaJesliZalogowany(session);
+    }
+    
     });
 }
 // ==========================================
-
 
 let viewDate = new Date();
 let daysData = {};
@@ -1731,7 +1733,7 @@ setTimeout(() => {
             authMessage.style.color = '#00e5ff';
             authMessage.textContent = 'Wysyłanie linku...';
             
-                const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: 'https://dm2787.github.io/Moj-zarobek/chmura.index.html'
     });
             
