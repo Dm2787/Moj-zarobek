@@ -352,6 +352,16 @@ let currentUserId = "domyslny_uzytkownik_testowy";
 // AUTOMATYCZNE SPRAWDZANIE SESJI I RESETU HASŁA
 // ==========================================
 const usunOknoLogowaniaJesliZalogowany = async (session) => {
+
+    // --- NOWY "HAMULEC" ---
+    if (window.location.href.includes('type=recovery')) {
+        const loginModal = document.getElementById('login-modal');
+        if (loginModal) loginModal.style.display = 'flex'; // Pokaż ekran logowania
+        console.log("Wykryto reset: Zatrzymuję automatyczne logowanie.");
+        return; // Wyjdź z funkcji, nie rób nic więcej!
+    }
+    // -----------------------
+    
     const loginModal = document.getElementById('login-modal');
     if (session) {
         currentUserId = session.user.id;
@@ -365,10 +375,7 @@ const usunOknoLogowaniaJesliZalogowany = async (session) => {
 
 if (supabaseClient) {
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        // Blokada: wykonaj logowanie tylko, jeśli NIE resetujesz hasła
-        if (!window.location.href.includes('type=recovery')) {
-            usunOknoLogowaniaJesliZalogowany(session);
-        }
+        usunOknoLogowaniaJesliZalogowany(session);
     });
 }
 
@@ -392,7 +399,7 @@ if (supabaseClient) {
     }
     
     });
-}
+
 // ==========================================
 
 let viewDate = new Date();
@@ -1736,8 +1743,8 @@ setTimeout(() => {
             authMessage.style.color = '#00e5ff';
             authMessage.textContent = 'Wysyłanie linku...';
             
-        const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://dm2787.github.io/Moj-zarobek/'
+    const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://dm2787.github.io/Moj-zarobek/chmura.index.html'
     });
             
             if (error) {
