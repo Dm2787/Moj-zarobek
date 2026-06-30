@@ -1733,8 +1733,8 @@ setTimeout(() => {
             authMessage.style.color = '#00e5ff';
             authMessage.textContent = 'Wysyłanie linku...';
             
-    const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://dm2787.github.io/Moj-zarobek/chmura.index.html'
+        const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://dm2787.github.io/Moj-zarobek/'
     });
             
             if (error) {
