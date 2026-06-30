@@ -184,13 +184,13 @@ td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; verti
 
 <script>
 // ==========================================
-// TWARDA ZAPORA BEZPIECZEŃSTWA (WYKONYWANA PRZED RYSOWANIEM UI)
+// TWARDA ZAPORA BEZPIECZEŃSTWA PAMIĘCI RAM
+// Ten skrypt wykonuje się zanim aplikacja w ogóle zdąży załadować cokolwiek.
 // ==========================================
-// Jeżeli w linku znajduje się token "recovery", aplikacja NATYCHMIAST
-// podnosi flagę kwarantanny. Flaga ta blokuje całkowicie załadowanie bazy danych
-// dopóki użytkownik nie zmieni hasła.
+window.HARD_RECOVERY_LOCK = false; // Domyślnie brak blokady
+
 if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
-    localStorage.setItem('ZAPORA_RECOVERY', 'AKTYWNA');
+    window.HARD_RECOVERY_LOCK = true; // ZATRZASK: Użytkownik wszedł z linku resetującego!
 }
 </script>
 
@@ -212,7 +212,7 @@ if (window.location.hash.includes('type=recovery') || window.location.search.inc
     <div style="font-size: 12px; color: #888;">Aplikacja działa wyłącznie w pozycji pionowej.</div>
 </div>
 
-<!-- KONTENER APLIKACJI -->
+<!-- KONTENER KALENDARZA ZABEZPIECZONY INLINE STYLEM -->
 <div class="container" id="app-container" style="display: none;">
     <div class="header" id="tour-step-header">
         <div id="dayLabel">--</div>
@@ -348,7 +348,7 @@ const monthNames = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lip
 const dayNamesLong = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
 
 // ==========================================
-//    KONFIGURACJA CHMURY SUPABASE (BEZ LOGOWANIA)
+//    KONFIGURACJA CHMURY SUPABASE
 // ==========================================
 const SUPABASE_URL = "https://rvyaelsrlvzapalucimp.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2eWFlbHNybHZ6YXBhbHVjaW1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NDQ5ODcsImV4cCI6MjA5ODEyMDk4N30.4-dFa9zpsCFVG6bBoy9ttYUlbSePQ9lt1wJD6dR6750";
@@ -360,49 +360,50 @@ const supabaseClient = (SUPABASE_URL.indexOf("TUTAJ_") === -1 && window.supabase
 let currentUserId = "domyslny_uzytkownik_testowy"; 
 
 // ==========================================
-// EGZEKWOWANIE STANU BEZPIECZEŃSTWA APLIKACJI
+// ZABEZPIECZENIE STANU APLIKACJI (KONTROLA DOSTĘPU)
 // ==========================================
 async function wymusStanAplikacji(session) {
     const loginModal = document.getElementById('login-modal');
     const recoveryModal = document.getElementById('recovery-modal');
     const appContainer = document.getElementById('app-container');
 
-    // 1. SPRAWDZENIE TWARDEJ FLAGI (NAJWYŻSZY PRIORYTET)
-    if (localStorage.getItem('ZAPORA_RECOVERY') === 'AKTYWNA') {
-        console.log("BLOKADA BEZPIECZEŃSTWA: Czekam na zmianę hasła.");
+    // JEŚLI ZAPORA W RAMIE JEST AKTYWNA:
+    // Nikt, pod żadnym pozorem nie wejdzie do kalendarza!
+    if (window.HARD_RECOVERY_LOCK === true) {
+        console.log("🔒 ZAPORA AKTYWNA: Trwa bezpieczny proces zmiany hasła.");
         if (loginModal) loginModal.style.display = 'none';
-        if (appContainer) appContainer.style.display = 'none'; // Kalendarz całkowicie ukryty
-        if (recoveryModal) recoveryModal.style.display = 'flex'; // Tylko okno resetu hasła jest widoczne
-        return; // ABSOLUTNIE ZAKAZUJEMY WYKONYWANIA DALSZEGO KODU - ŻADNEGO loadFromDB()!
+        if (appContainer) appContainer.style.display = 'none'; // BEZWZGLĘDNIE UKRYTE
+        if (recoveryModal) recoveryModal.style.display = 'flex'; // Zostawiamy tylko okno resetu
+        return; // PRZERYWAMY DALSZE WYKONYWANIE
     }
 
-    // 2. NORMALNY TRYB DZIAŁANIA
+    // JEŚLI ZAPORY NIE MA (NORMALNE LOGOWANIE):
     if (session) {
         currentUserId = session.user.id;
         if (loginModal) loginModal.style.display = 'none';
         if (recoveryModal) recoveryModal.style.display = 'none';
-        if (appContainer) appContainer.style.display = 'flex'; // Pokazujemy kalendarz
+        if (appContainer) appContainer.style.display = 'flex'; // Wpuszczamy do aplikacji
         await loadFromDB();
         render(); 
     } else {
         if (loginModal) loginModal.style.display = 'flex';
         if (recoveryModal) recoveryModal.style.display = 'none';
-        if (appContainer) appContainer.style.display = 'none'; // Kalendarz ukryty
+        if (appContainer) appContainer.style.display = 'none'; // Zabezpieczenie dla pewności
     }
 }
 
 if (supabaseClient) {
-    // Odpala się od razu po starcie
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
         wymusStanAplikacji(session);
     });
 
-    // Nasłuchuje na każde zablokowanie telefonu/odświeżenie
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        // Gdy Supabase odbierze sygnał, że kliknąłeś link
         if (event === 'PASSWORD_RECOVERY') {
-            localStorage.setItem('ZAPORA_RECOVERY', 'AKTYWNA'); // Odświeżamy zaporę w razie czego
+            window.HARD_RECOVERY_LOCK = true; // Zabezpieczamy dostęp do pamięci RAM
         }
-        // Za każdym razem po otrzymaniu sygnału od Supabase, wymuszamy bezpieczny stan UI
+        
+        // Funkcja decyduje, co pokazać, bazując na HARD_RECOVERY_LOCK i sesji
         wymusStanAplikacji(session);
     });
 }
@@ -503,15 +504,12 @@ function initDB() {
     });
 }
 
-// ASYNCHRONICZNY ZAPIS Z GWARANTOWANYM WYNIKIEM KOMUNIKACJI SIECIOWEJ
 async function saveToDB(key, data) {
     if (!db) return false;
     
-    // 1. Zapis lokalny do IndexedDB (Zawsze realizowany bez opóźnień)
     const tx = db.transaction("days", "readwrite");
     tx.objectStore("days").put({ key: key, ...data });
 
-    // 2. Próba zapisu do chmury Supabase
     if (supabaseClient && currentUserId) {
         try {
             const { error } = await supabaseClient
@@ -530,21 +528,19 @@ async function saveToDB(key, data) {
   }, { onConflict: 'user_id,day_key' });
                 
             if (error) throw error;
-            return true; // Sukces - chmura zatwierdziła transakcję
+            return true; 
         } catch (err) {
-            console.warn("Chmura niedostępna lub błąd zapisu. Dane bezpieczne w pamięci telefonu.", err);
-            return false; // Błąd sieci lub serwera
+            console.warn("Chmura niedostępna lub błąd zapisu.", err);
+            return false; 
         }
     }
-    return false; // Brak aktywnej konfiguracji Supabase
+    return false; 
 }
 
-// ASYNCHRONICZNE ŁADOWANIE DANYCH Z INTEGRACJĄ CHMURY
 async function loadFromDB() {
     return new Promise((resolve) => {
         if (!db) return resolve();
         
-        // 1. Wyciągnięcie danych lokalnych dla natychmiastowego startu UI
         const req = db.transaction("days", "readonly").objectStore("days").getAll();
         req.onsuccess = async () => {
             daysData = {};
@@ -553,7 +549,6 @@ async function loadFromDB() {
                 daysData[key] = rest;
             });
             
-            // 2. Jeśli chmura jest skonfigurowana, dociągamy najnowsze wpisy
             if (supabaseClient && currentUserId) {
                 try {
                     const { data, error } = await supabaseClient
@@ -576,14 +571,11 @@ async function loadFromDB() {
                                 work: item.work !== undefined ? item.work : 1
                             };
                             
-                            // Aktualizujemy lokalny cache w telefonie
                             const localTx = db.transaction("days", "readwrite");
                             localTx.objectStore("days").put({ key: item.day_key, ...daysData[item.day_key] });
                         });
                     }
-                } catch (err) {
-                    console.log("Uruchomiono w trybie offline (brak chmury).");
-                }
+                } catch (err) {}
             }
             resolve();
         };
@@ -762,7 +754,6 @@ async function logoutUser() {
     } else {
         currentUserId = null;
         
-        // --- SPRZĄTANIE EKRANU LOGOWANIA PO WYLOGOWANIU ---
         const btnLogin = document.getElementById('btn-login');
         if (btnLogin) btnLogin.textContent = 'ZALOGUJ SIĘ';
         
@@ -770,8 +761,7 @@ async function logoutUser() {
         if (authMessage) authMessage.textContent = '';
         
         const authPassword = document.getElementById('auth-password');
-        if (authPassword) authPassword.value = ''; // Czyści też pole z wpisanym starym hasłem
-        // --------------------------------------------------
+        if (authPassword) authPassword.value = ''; 
         
         document.getElementById('app-container').style.display = 'none';
         document.getElementById('login-modal').style.display = 'flex';
@@ -796,7 +786,6 @@ function closeAllModals() {
     }, 250);
 }
 
-// PRAWDZIWA UCZCIWA LOGIKA TOASTÓW PO ZAPISIE DNIA
 async function saveDay() {
     const key = currentEditingKey;
     if(!daysData[key]) daysData[key] = {work:1};
@@ -828,7 +817,6 @@ async function saveDay() {
     
     render(); checkBackupStatus();
     
-    // Weryfikacja czy serwer zaakceptował paczkę danych
     const isCloudSaved = await saveToDB(key, daysData[key]);
     if (isCloudSaved) {
         showToast("Zapisano ustawienia dnia w chmurze.");
@@ -837,7 +825,6 @@ async function saveDay() {
     }
 }
 
-// PRAWDZIWA UCZCIWA LOGIKA DLA ZMIAN MASOWYCH
 async function applyToBulk(mode) {
     const rate = Number(document.getElementById("editRate").value);
     const start = document.getElementById("workStart").value;
@@ -1032,7 +1019,6 @@ function render() {
             <td onclick="triggerSettingsWithAnimation(event, this, '${key}')">${settingsIcon}</td>
         `;
         
-        // Asynchroniczne przełączanie stanu dnia z wiersza
         tr.onclick = async (e) => { 
             if(tourActive) return; 
             const clickedTd = e.target.closest('td');
@@ -1526,7 +1512,10 @@ function endTour() {
 
 initDB().then(() => {
     loadFromDB().then(() => {
-        render(); updateWeather(); checkBackupStatus(); scrollToToday();
+        // Dodatkowe zabezpieczenie: nie inicjuj aplikacji, jeśli trwa reset
+        if (window.HARD_RECOVERY_LOCK !== true) {
+            render(); updateWeather(); checkBackupStatus(); scrollToToday();
+        }
         setInterval(updateWeather, 900000);
         
         const splash = document.getElementById('splash-screen');
@@ -1539,7 +1528,7 @@ initDB().then(() => {
             }, 800);
         }
         
-        if (!localStorage.getItem("tutorial_done")) {
+        if (!localStorage.getItem("tutorial_done") && window.HARD_RECOVERY_LOCK !== true) {
             setTimeout(startTour, 1800);
         }
     });
@@ -1585,9 +1574,10 @@ setTimeout(() => {
             } else {
                 msg.style.color = '#00e5ff';
                 msg.textContent = 'Zmieniono pomyślnie! Przywracam system...';
-                localStorage.removeItem('ZAPORA_RECOVERY'); // Dopiero po sukcesie niszczymy zaporę
+                window.HARD_RECOVERY_LOCK = false; // Dopiero po sukcesie niszczymy zaporę z pamięci RAM
                 await supabaseClient.auth.signOut(); // Wylogowujemy wymuszoną sesję resetowania
-                window.location.href = window.location.pathname; // Przeładowanie na świeżo (bez żadnych starych danych w linku)
+                // Całkowity reset URL i strony
+                window.location.href = window.location.href.split('#')[0].split('?')[0]; 
             }
         });
     }
@@ -1601,9 +1591,9 @@ setTimeout(() => {
             msg.textContent = 'Anulowanie operacji...';
             btnCancelRecovery.disabled = true;
 
-            localStorage.removeItem('ZAPORA_RECOVERY'); // Zrzucamy zaporę ręcznie
+            window.HARD_RECOVERY_LOCK = false; // Zrzucamy zaporę ręcznie
             await supabaseClient.auth.signOut(); // Niszczymy sesję
-            window.location.href = window.location.pathname; // Oczyszczenie systemu z komend w linku
+            window.location.href = window.location.href.split('#')[0].split('?')[0]; // Oczyszczenie systemu z komend w linku
         });
     }
 
