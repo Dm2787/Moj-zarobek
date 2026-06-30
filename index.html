@@ -351,7 +351,7 @@ let currentUserId = "domyslny_uzytkownik_testowy";
 // ==========================================
 // AUTOMATYCZNE SPRAWDZANIE SESJI I RESETU HASŁA
 // ==========================================
-const usunOknoLogowaniaJesliZalogowany = async (session) => {
+async function usunOknoLogowaniaJesliZalogowany(session) {
 
     // --- NOWY "HAMULEC" ---
     if (window.location.href.includes('type=recovery')) {
@@ -371,7 +371,7 @@ const usunOknoLogowaniaJesliZalogowany = async (session) => {
     } else {
         if (loginModal) loginModal.style.display = 'flex'; // Pokaż ekran logowania
     }
-};
+}
 
 if (supabaseClient) {
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
@@ -379,26 +379,27 @@ if (supabaseClient) {
     });
 }
 
-    // 2. NASŁUCHIWANIE NA ZMIANY (LOGOWANIE, WYLOGOWANIE, RESET HASŁA)
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-        // WYKRYCIE RESETU HASŁA
-        if (event === 'PASSWORD_RECOVERY') {
-            const newPassword = prompt("Wpisz swoje nowe hasło (minimum 6 znaków):");
-            if (newPassword) {
-                const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
-                if (error) {
-                    alert("Błąd podczas zmiany hasła: " + error.message);
-                } else {
-                    alert("Super! Hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.");
-                }
+// 2. NASŁUCHIWANIE NA ZMIANY (LOGOWANIE, WYLOGOWANIE, RESET HASŁA)
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    // WYKRYCIE RESETU HASŁA
+    if (event === 'PASSWORD_RECOVERY') {
+        const newPassword = prompt("Wpisz swoje nowe hasło (minimum 6 znaków):");
+        if (newPassword) {
+            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+            if (error) {
+                alert("Błąd podczas zmiany hasła: " + error.message);
+            } else {
+                alert("Super! Hasło zostało pomyślnie zmienione. Możesz się teraz zalogować.");
             }
         }
-        // Aktualizacja wyglądu ekranu na podstawie sesji
-            if (event !== 'PASSWORD_RECOVERY') {
+        return; // WAŻNE: Przerywamy działanie, by nie wywoływało logowania poniżej!
+    }
+
+    // Aktualizacja wyglądu ekranu na podstawie sesji (tylko gdy to nie reset)
+    if (event !== 'PASSWORD_RECOVERY') {
         usunOknoLogowaniaJesliZalogowany(session);
     }
-    
-    });
+});
 
 // ==========================================
 
@@ -1744,7 +1745,7 @@ setTimeout(() => {
             authMessage.textContent = 'Wysyłanie linku...';
             
     const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://dm2787.github.io/Moj-zarobek/chmura.index.html'
+        redirectTo: 'https://dm2787.github.io/Moj-zarobek/'
     });
             
             if (error) {
