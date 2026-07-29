@@ -321,7 +321,7 @@ if (window.location.hash.includes('type=recovery') || window.location.search.inc
     <button type="button" onclick="logoutUser()" style="background: rgba(255, 26, 26, 0.1); border: 1px solid #ff4444; color: #ff4444; padding: 8px 15px; border-radius: 6px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">🚪 Wyloguj się</button>
 </div>
 
-        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.3.0</span>
+        <span style="color: #666; font-size: 11px; font-family: monospace; letter-spacing: 1px;">WERSJA: 1.3.1</span>
     </div>
 </div>
 
@@ -771,7 +771,7 @@ async function logoutUser() {
         if (authMessage) authMessage.textContent = '';
         
         const authPassword = document.getElementById('auth-password');
-        if (authPassword) authPassword.value = ''; // Czyści też pole z wpisanym starym hasłem
+        if (authPassword) authPassword.value = ''; 
         // --------------------------------------------------
         
         document.getElementById('app-container').style.display = 'none';
@@ -893,6 +893,7 @@ async function applyToBulk(mode) {
     }
 }
 
+// ZABEZPIECZONA FUNKCJA MATEMATYCZNA OBLICZANIA CZASU
 function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
     if (!dayObj || dayObj.work === 0) return 0;
     let sTime = dayObj.start || "00:00";
@@ -912,6 +913,7 @@ function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
     let totalMs = finish.getTime() - start.getTime();
 
     (dayObj.customBreaks || []).forEach((b, idx) => {
+        if (!b || b.length < 2 || !b[0] || !b[1]) return; // Zabezpieczenie przed pustą przerwą
         if (dayObj.breaksPaidFlags && dayObj.breaksPaidFlags[idx] === true) return;
 
         let bStartParts = b[0].split(":").map(Number);
@@ -921,12 +923,10 @@ function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
         let be = new Date(parts[0], parts[1] - 1, parts[2], bEndParts[0], bEndParts[1], 0, 0);
 
         if (dayObj.isNightShift === true) {
-            // Jeśli przerwa zaczyna się po północy (np. o 01:00), a zmiana zaczęła się przed (np. o 20:00)
             if (bStartParts[0] < startParts[0]) bs.setDate(bs.getDate() + 1);
             if (bEndParts[0] < startParts[0]) be.setDate(be.getDate() + 1);
         }
 
-        // Logika przejścia przez północ w samej przerwie (bezpieczne porównanie milisekund)
         if (be.getTime() <= bs.getTime()) {
             be.setDate(be.getDate() + 1);
         }
@@ -1169,23 +1169,14 @@ function formatTimeLeft(ms) {
 
 function changeMonth(step) { viewDate.setMonth(viewDate.getMonth() + step); render(); }
 
+// ==========================================
+// POGODA (FALLBACK USTAWIONY SZTYWNO NA KIRUNĘ)
+// ==========================================
 function updateWeather() {
     const weatherInfo = document.getElementById('weather-info');
-    const defaultCity = "Boden";
-    const defaultLat = 65.8251;
-    const defaultLon = 21.6887;
-
-    const getForecast = (lat, lon, cityName = "") => {
-        if (!cityName) {
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-                .then(res => res.json())
-                .then(geo => {
-                    const city = geo.address.city || geo.address.town || geo.address.village || "Twoja lokalizacja";
-                    fetchWeather(lat, lon, city);
-                })
-                .catch(() => fetchWeather(lat, lon, "Twoja pozycja"));
-        } else { fetchWeather(lat, lon, cityName); }
-    };
+    const defaultCity = "Kiruna";
+    const defaultLat = 67.8558;
+    const defaultLon = 20.2253;
 
     const fetchWeather = (lat, lon, city) => {
         fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m`)
@@ -1202,25 +1193,23 @@ function updateWeather() {
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-            (pos) => getForecast(pos.coords.latitude, pos.coords.longitude),
-            () => {
-                fetch('https://ipapi.co/json/')
+            (pos) => {
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`)
                     .then(res => res.json())
-                    .then(loc => {
-                        if(loc.latitude && loc.longitude) {
-                            getForecast(loc.latitude, loc.longitude, loc.city);
-                        } else {
-                            getForecast(defaultLat, defaultLon, defaultCity);
-                        }
+                    .then(geo => {
+                        const city = geo.address.city || geo.address.town || geo.address.village || "Twoja pozycja";
+                        fetchWeather(pos.coords.latitude, pos.coords.longitude, city);
                     })
-                    .catch(() => {
-                        getForecast(defaultLat, defaultLon, defaultCity);
-                    });
+                    .catch(() => fetchWeather(pos.coords.latitude, pos.coords.longitude, "Twoja pozycja"));
+            },
+            () => {
+                // Twardy i bezpieczny fallback prosto do Kiruny w Szwecji
+                fetchWeather(defaultLat, defaultLon, defaultCity);
             },
             { enableHighAccuracy: true, timeout: 5000 }
         );
     } else {
-        getForecast(defaultLat, defaultLon, defaultCity);
+        fetchWeather(defaultLat, defaultLon, defaultCity);
     }
 }
 
@@ -1268,8 +1257,13 @@ setInterval(() => {
             document.getElementById("todayWork").textContent = `Dziś przepracowano: ${formatHoursToHM(liveHours)} H`;
             document.getElementById("progress-bar").style.width = ((now - s) / (e - s) * 100) + "%";
             
+            // ==========================================
+            // ZABEZPIECZONY LICZNIK PRZERWY NA ŻYWO (MILISEKUNDY)
+            // ==========================================
             let currentBreak = null; let nextBreak = null;
             (dObj.customBreaks || []).forEach(b => {
+                if (!b || b.length < 2 || !b[0] || !b[1]) return; // Ochrona przed pustymi polami
+
                 let bStartParts = b[0].split(":").map(Number);
                 let bEndParts = b[1].split(":").map(Number);
                 let bs = new Date(parts[0], parts[1] - 1, parts[2], bStartParts[0], bStartParts[1], 0, 0);
@@ -1277,19 +1271,28 @@ setInterval(() => {
                 
                 if (dObj.isNightShift === true) {
                     if (bStartParts[0] < startParts[0]) bs.setDate(bs.getDate() + 1);
-                    if (bEndParts[0] < startParts[0] || be <= bs) be.setDate(be.setDate() + 1);
-                } else {
-                    if (bEndParts[0] <= bStartParts[0]) be.setDate(be.setDate() + 1);
+                    if (bEndParts[0] < startParts[0]) be.setDate(be.getDate() + 1);
                 }
                 
-                if(now >= bs && now < be) currentBreak = be - now;
-                else if (bs > now && (!nextBreak || bs < nextBreak)) nextBreak = bs;
+                if (be.getTime() <= bs.getTime()) {
+                    be.setDate(be.getDate() + 1);
+                }
+                
+                let nowTime = now.getTime();
+                let bsTime = bs.getTime();
+                let beTime = be.getTime();
+                
+                if(nowTime >= bsTime && nowTime < beTime) {
+                    currentBreak = beTime - nowTime;
+                } else if (bsTime > nowTime && (!nextBreak || bsTime < nextBreak.getTime())) {
+                    nextBreak = bs;
+                }
             });
 
             if(currentBreak) {
                 breakInfo = `<span style="color:var(--green)">PRZERWA! (zostało: ${formatTimeLeft(currentBreak)})</span>`;
             } else if(nextBreak) {
-                breakInfo = `Przerwa za: ${formatTimeLeft(nextBreak - now)}`;
+                breakInfo = `Przerwa za: ${formatTimeLeft(nextBreak.getTime() - now.getTime())}`;
             }
         } 
         else if (now < s) {
