@@ -330,19 +330,6 @@ if (window.location.hash.includes('type=recovery') || window.location.search.inc
     <button style="width:100%; padding:12px; background:var(--orange); color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="closeAllModals()">ZAMKNIJ</button>
 </div>
 
-<!-- ==========================================
-MODAL POWIADOMIENIA O AKTUALIZACJI 
-=========================================== -->
-<div id="update-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100000; align-items: center; justify-content: center; flex-direction: column;">
-    <div style="background: var(--panel); border: 2px solid var(--green); border-radius: 15px; padding: 25px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 30px rgba(0, 255, 166, 0.2);">
-        <div style="font-size: 40px; margin-bottom: 10px;">🚀</div>
-        <h3 style="color: var(--green); margin-top: 0; margin-bottom: 15px; font-size: 20px;">Nowa aktualizacja!</h3>
-        <p style="color: #ccc; font-size: 14px; line-height: 1.5; margin-bottom: 25px;">Pobrano nową wersję aplikacji. Kliknij przycisk poniżej, aby ją zainstalować i uruchomić ponownie.</p>
-        <button onclick="window.location.reload(true)" style="width: 100%; padding: 12px; background: var(--green); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; text-transform: uppercase;">Aktualizuj teraz</button>
-        <button onclick="document.getElementById('update-modal').style.display='none'" style="width: 100%; padding: 12px; background: transparent; color: #888; border: 1px solid #444; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; margin-top: 10px; text-transform: uppercase;">Później</button>
-    </div>
-</div>
-
 <div id="tourOverlay" class="tour-overlay"></div>
 <div id="tourBubble" class="tour-bubble">
     <div id="tourText"></div>
@@ -413,6 +400,7 @@ if (supabaseClient) {
         wymusStanAplikacji(session);
     });
 }
+// ==========================================
 
 let viewDate = new Date();
 let daysData = {};
@@ -884,7 +872,6 @@ async function applyToBulk(mode) {
     }
 }
 
-// ZABEZPIECZONA FUNKCJA MATEMATYCZNA OBLICZANIA CZASU
 function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
     if (!dayObj || dayObj.work === 0) return 0;
     let sTime = dayObj.start || "00:00";
@@ -904,7 +891,7 @@ function calculateWork(currentTimeObj, dayObj, dayKeyStr) {
     let totalMs = finish.getTime() - start.getTime();
 
     (dayObj.customBreaks || []).forEach((b, idx) => {
-        if (!b || b.length < 2 || !b[0] || !b[1]) return; // Zabezpieczenie przed pustą przerwą
+        if (!b || b.length < 2 || !b[0] || !b[1]) return; 
         if (dayObj.breaksPaidFlags && dayObj.breaksPaidFlags[idx] === true) return;
 
         let bStartParts = b[0].split(":").map(Number);
@@ -1239,8 +1226,10 @@ setInterval(() => {
         if (dObj.isNightShift === true) e.setDate(e.getDate() + 1);
 
         if (now > e) {
+            // TUTAJ ZMIANA: WYŚWIETLANIE SUMY GODZIN + NAPIS FAJRANT
+            let finalHours = calculateWork(e, dObj, activeKey);
             document.getElementById("progress-bar").style.width = "100%";
-            document.getElementById("todayWork").innerHTML = '<span style="color:#ffd700;">FAJRANT! 🍻</span>';
+            document.getElementById("todayWork").innerHTML = `Dziś przepracowano: ${formatHoursToHM(finalHours)} H<br><span style="color:#ffd700; font-size:18px; display:inline-block; margin-top:5px;">FAJRANT! 🍻</span>`;
             breakInfo = ""; 
         } 
         else if (now >= s && now <= e) {
@@ -1253,7 +1242,7 @@ setInterval(() => {
             // ==========================================
             let currentBreak = null; let nextBreak = null;
             (dObj.customBreaks || []).forEach(b => {
-                if (!b || b.length < 2 || !b[0] || !b[1]) return; 
+                if (!b || b.length < 2 || !b[0] || !b[1]) return; // Ochrona przed pustymi polami
 
                 let bStartParts = b[0].split(":").map(Number);
                 let bEndParts = b[1].split(":").map(Number);
@@ -1298,9 +1287,6 @@ setInterval(() => {
     document.getElementById("breakTimer").innerHTML = breakInfo;
 }, 1000);
 
-// ==========================================
-// ZAAWANSOWANE POWIADOMIENIE O AKTUALIZACJI (MODAL)
-// ==========================================
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(reg => {
         reg.addEventListener('updatefound', () => {
@@ -1308,11 +1294,8 @@ if ('serviceWorker' in navigator) {
             if (newWorker) {
                 newWorker.addEventListener('statechange', () => {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // Zamiast autoodświeżania, pokazujemy użytkownikowi modal
-                        const updateModal = document.getElementById('update-modal');
-                        if (updateModal) {
-                            updateModal.style.display = 'flex';
-                        }
+                        showToast("Pobrano aktualizację! Odświeżam...", "success");
+                        setTimeout(() => { window.location.reload(); }, 2000);
                     }
                 });
             }
@@ -1614,6 +1597,7 @@ setTimeout(() => {
         });
     }
 
+
     // --- SYSTEM ODLICZANIA BLOKADY (RATE LIMIT) ---
     let rateLimitTimerInterval = null;
     const RATE_LIMIT_DURATION = 60 * 60 * 1000; 
@@ -1857,7 +1841,7 @@ setTimeout(() => {
     
     <button id="btn-save-recovery" style="width: 80%; max-width: 300px; padding: 15px; background: #ff9900; color: #000; font-weight: bold; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">ZMIEŃ HASŁO</button>
     
-    <button id="btn-cancel-recovery" style="width: 80%; max-width: 300px; padding: 15px; background: transparent; color: #ff9900; border: 1px solid #ff9900; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px;">ANULUJ I WRÓĆ</button>
+    <button id="btn-cancel-recovery" style="width: 80%; max-width: 300px; padding: 15px; background: transparent; color: #ff9900; border: 1px solid #ff9900; border-radius: 8px; font-size: 16px; cursor: margin-top: 10px;">ANULUJ I WRÓĆ</button>
 
     <p id="recovery-message" style="color: #ff4444; margin-top: 20px; font-size: 14px; text-align: center; min-height: 20px; padding: 0 20px;"></p>
 </div>
