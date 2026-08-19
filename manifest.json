@@ -53,14 +53,12 @@
     {
       "src": "./screenshots/screen-1.png",
       "sizes": "1080x2208",
-      "type": "image/png",
       "form_factor": "narrow",
       "label": "Widok główny i licznik pracy"
     },
     {
       "src": "./screenshots/screen-2.png",
       "sizes": "1080x2140",
-      "type": "image/png",
       "form_factor": "narrow",
       "label": "Tabela godzin i podsumowanie"
     }
