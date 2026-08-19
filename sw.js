@@ -1,4 +1,4 @@
-const CACHE_NAME = 'czas-pracy-v19';
+const CACHE_NAME = 'czas-pracy-v20';
 
 // Pliki niezbędne do startu aplikacji w trybie offline
 const STATIC_ASSETS = [
