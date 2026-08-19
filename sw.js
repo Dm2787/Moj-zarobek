@@ -1,5 +1,8 @@
-const CACHE_NAME = 'czas-pracy-v17'; // Zmieniono na v17, aby zresetować pamięć po usunięciu błędu ścieżki
-const FILES_TO_CACHE = [
+const CACHE_NAME = 'czas-pracy-v19';
+
+// Pliki niezbędne do startu aplikacji w trybie offline
+const STATIC_ASSETS = [
+  './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
@@ -7,34 +10,51 @@ const FILES_TO_CACHE = [
   './icons/icon-maskable.png'
 ];
 
+// Instalacja i zapisanie kluczowych plików w pamięci podręcznej
 self.addEventListener('install', (evt) => {
   evt.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Zapisuję pliki aplikacji do trybu offline');
-      return cache.addAll(FILES_TO_CACHE);
+      return cache.addAll(STATIC_ASSETS);
     })
   );
   self.skipWaiting();
 });
 
+// Czyszczenie starych wersji pamięci podręcznej
 self.addEventListener('activate', (evt) => {
   evt.waitUntil(
-    caches.keys().then((keyList) => {
-      return Promise.all(keyList.map((key) => {
-        if (key !== CACHE_NAME) {
-          console.log('Usuwam stary cache', key);
-          return caches.delete(key);
-        }
-      }));
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
     })
   );
   self.clients.claim();
 });
 
+// Obsługa zapytań sieciowych
 self.addEventListener('fetch', (evt) => {
+  // Ignoruj zapytania inne niż GET (np. logowanie Supabase, zapis danych POST/PUT)
+  if (evt.request.method !== 'GET') return;
+
+  // Ignoruj zapytania do zewnętrznych API (Supabase, Pogoda Nominatim / Open-Meteo)
+  const url = new URL(evt.request.url);
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
   evt.respondWith(
-    caches.match(evt.request).then((res) => {
-      return res || fetch(evt.request);
+    caches.match(evt.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(evt.request).then((networkResponse) => {
+        return networkResponse;
+      });
     })
   );
 });
