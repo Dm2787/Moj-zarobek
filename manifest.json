@@ -4,11 +4,17 @@
   "short_name": "Czas pracy",
   "description": "Aplikacja do bezpiecznego rejestrowania czasu pracy, wyliczania godzin oraz zarobków bezpośrednio na urządzeniu.",
   "start_url": "./index.html",
+  "scope": "./",
+  "lang": "pl",
+  "dir": "ltr",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#0b0f14",
   "theme_color": "#00eaff",
-  "orientation": "portrait",
   "categories": ["productivity", "utilities"],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "icons": [
     {
       "src": "./icons/icon-192.png",
@@ -27,6 +33,36 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Rejestr pracy",
+      "short_name": "Kalendarz",
+      "description": "Otwórz aplikację",
+      "url": "./index.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshots/screen-1.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Widok główny i licznik pracy"
+    },
+    {
+      "src": "./screenshots/screen-2.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tabela godzin i podsumowanie"
     }
   ]
 }
